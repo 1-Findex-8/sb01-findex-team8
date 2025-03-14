@@ -16,8 +16,8 @@ public record IndexDataDto(
     @Schema(description = "기준 일자", example = "2023-01-01")
     LocalDate baseDate, // 기준 일자
 
-    @Schema(description = "출처 (USER, OPEN_API)", example = "OPEN_API", allowableValues = {"USER", "OPEN_API"})
-    SourceType sourceType, // 출처 (USER, OPEN_API)
+    @Schema(description = "출처 (사용자, Open API)", example = "OPEN_API", allowableValues = {"USER", "OPEN_API"})
+    SourceType sourceType, // 출처
 
     @Schema(description = "시가", example = "2800.25")
     BigDecimal marketPrice, // 시가

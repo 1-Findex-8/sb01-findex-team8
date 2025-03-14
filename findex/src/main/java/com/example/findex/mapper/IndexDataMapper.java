@@ -1,9 +1,9 @@
 package com.example.findex.mapper;
 
 import com.example.findex.dto.data.IndexDataDto;
-import com.example.findex.dto.data.IndexDataDto.SourceType;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
+import com.example.findex.entity.SourceType;
 import com.example.findex.repository.IndexInfoRepository;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;

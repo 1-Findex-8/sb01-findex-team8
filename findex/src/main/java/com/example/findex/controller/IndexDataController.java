@@ -1,6 +1,6 @@
 package com.example.findex.controller;
 
-import com.example.findex.api.IndexDatApi;
+import com.example.findex.api.IndexDataApi;
 import com.example.findex.dto.data.IndexDataDto;
 import com.example.findex.dto.request.IndexDataCreateRequest;
 import com.example.findex.dto.response.ErrorResponse;
@@ -18,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/index-data")
 @RequiredArgsConstructor
-public class IndexDataController implements IndexDatApi {
+public class IndexDataController implements IndexDataApi {
 
   private final IndexDataService indexDataService;
 
   @PostMapping
+  @Override
   public ResponseEntity<?> createIndexData(@RequestBody IndexDataCreateRequest indexDataCreateRequest) {
     try{
       IndexDataDto indexDto = indexDataService.create(indexDataCreateRequest);

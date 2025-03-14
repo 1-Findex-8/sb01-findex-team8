@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import com.example.findex.dto.response.ErrorResponse;
 
 @Tag(name = "지수 데이터 API")
-public interface IndexDatApi {
+public interface IndexDataApi {
 
   //POST /api/index-data
   @Operation(

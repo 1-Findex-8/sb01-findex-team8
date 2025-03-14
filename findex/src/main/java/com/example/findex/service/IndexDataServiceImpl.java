@@ -21,7 +21,6 @@ public class IndexDataServiceImpl implements IndexDataService {
   private final IndexInfoRepository indexInfoRepository;
   private final IndexDataMapper indexDataMapper;
 
-
   //지수 데이터 생성
   @Override
   public IndexDataDto create(IndexDataCreateRequest request) {
@@ -29,7 +28,8 @@ public class IndexDataServiceImpl implements IndexDataService {
     if (indexDataRepository.existsByIndexInfoIdAndBaseDate(request.indexInfoId(),request.baseDate())) {
       throw new DataIntegrityViolationException("지수 및 날짜 조합이 이미 존재합니다.");
     }
-    IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId()).orElseThrow(()->new NoSuchElementException("IndexInfo with id "+request.indexInfoId()+ "not found"));
+    IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
+        .orElseThrow(()->new NoSuchElementException("IndexInfo with id "+request.indexInfoId()+ "not found"));
 
     //사용자가 생성
     IndexData indexData = new IndexData(

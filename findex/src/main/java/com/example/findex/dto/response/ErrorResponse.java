@@ -17,7 +17,7 @@ public record ErrorResponse(
     String message,
 
     @Schema(description = "에러 상세 내용", example = "부서 코드는 필수입니다.")
-    String detail
+    String details
 ) {
   public ErrorResponse(int status, String message, String details) {
     this(LocalDateTime.now(), status, message, details);
