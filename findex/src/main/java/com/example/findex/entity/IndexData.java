@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 @Table(name="index_data")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class IndexData extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "index_info_id", nullable = false)
@@ -58,23 +60,5 @@ public class IndexData extends BaseEntity {
   @Column(nullable = false)
   private Long marketCapitalization; //dto 에서 marketTotalAmount
 
-  public IndexData(IndexInfo indexInfo, LocalDate baseDate, SourceType sourceType,
-      BigDecimal marketPrice, BigDecimal closingPrice, BigDecimal highPrice, BigDecimal lowPrice,
-      BigDecimal variation, BigDecimal fluctuationRate, Long tradingQuantity,
-      Long tradingPrice,
-      Long marketCapitalization) {
-    this.indexInfo = indexInfo;
-    this.baseDate = baseDate;
-    this.sourceType = sourceType;
-    this.marketPrice = marketPrice;
-    this.closingPrice = closingPrice;
-    this.highPrice = highPrice;
-    this.lowPrice = lowPrice;
-    this.variation = variation;
-    this.fluctuationRate = fluctuationRate;
-    this.tradingQuantity = tradingQuantity;
-    this.tradingPrice = tradingPrice;
-    this.marketCapitalization = marketCapitalization;
-  }
 }
 

@@ -1,6 +1,5 @@
 package com.example.findex.dto.request;
 
-import com.example.findex.entity.IndexInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
