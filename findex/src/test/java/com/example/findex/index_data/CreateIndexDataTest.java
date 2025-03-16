@@ -12,7 +12,7 @@ import com.example.findex.entity.base.BaseEntity;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
-import com.example.findex.service.IndexDataServiceImpl;
+import com.example.findex.service.IndexDataService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +38,7 @@ public class CreateIndexDataTest {
   private IndexDataMapper indexDataMapper;
 
   @InjectMocks // Mock 객체들이 자동 주입
-  private IndexDataServiceImpl indexDataService;  // 실제 서비스 클래스
+  private IndexDataService indexDataService;  // 실제 서비스 클래스
 
   //IndexData 생성 성공 테스트
   @Test
