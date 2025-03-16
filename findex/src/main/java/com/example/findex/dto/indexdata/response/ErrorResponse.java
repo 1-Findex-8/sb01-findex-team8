@@ -1,8 +1,6 @@
-package com.example.findex.dto.response;
+package com.example.findex.dto.indexdata.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Schema(description = "에러 응답")

@@ -1,4 +1,4 @@
-package com.example.findex.dto.request;
+package com.example.findex.dto.indexdata.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

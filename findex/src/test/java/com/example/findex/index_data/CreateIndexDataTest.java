@@ -3,8 +3,8 @@ package com.example.findex.index_data;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.example.findex.dto.data.IndexDataDto;
-import com.example.findex.dto.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.data.IndexDataDto;
+import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;

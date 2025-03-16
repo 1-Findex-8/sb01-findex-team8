@@ -1,7 +1,7 @@
 package com.example.findex.service;
 
-import com.example.findex.dto.data.IndexDataDto;
-import com.example.findex.dto.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.data.IndexDataDto;
+import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 
 public interface IndexDataService {
 

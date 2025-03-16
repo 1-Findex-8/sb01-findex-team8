@@ -1,9 +1,9 @@
 package com.example.findex.controller;
 
 import com.example.findex.api.IndexDataApi;
-import com.example.findex.dto.data.IndexDataDto;
-import com.example.findex.dto.request.IndexDataCreateRequest;
-import com.example.findex.dto.response.ErrorResponse;
+import com.example.findex.dto.indexdata.data.IndexDataDto;
+import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.response.ErrorResponse;
 import com.example.findex.service.IndexDataService;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;

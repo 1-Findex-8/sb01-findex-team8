@@ -1,4 +1,4 @@
-package com.example.findex.dto.data;
+package com.example.findex.dto.indexdata.data;
 
 import com.example.findex.entity.SourceType;
 import io.swagger.v3.oas.annotations.media.Schema;

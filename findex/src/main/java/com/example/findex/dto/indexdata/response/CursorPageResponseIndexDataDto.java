@@ -1,6 +1,6 @@
-package com.example.findex.dto.response;
+package com.example.findex.dto.indexdata.response;
 
-import com.example.findex.dto.data.IndexDataDto;
+import com.example.findex.dto.indexdata.data.IndexDataDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 

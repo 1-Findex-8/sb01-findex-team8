@@ -1,7 +1,7 @@
 package com.example.findex.api;
 
-import com.example.findex.dto.data.IndexDataDto;
-import com.example.findex.dto.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.data.IndexDataDto;
+import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import com.example.findex.dto.response.ErrorResponse;
+import com.example.findex.dto.indexdata.response.ErrorResponse;
 
 @Tag(name = "지수 데이터 API")
 public interface IndexDataApi {
