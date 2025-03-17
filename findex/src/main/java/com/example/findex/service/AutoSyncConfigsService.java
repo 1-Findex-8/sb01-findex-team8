@@ -5,6 +5,7 @@ import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequ
 import com.example.findex.entity.AutoSyncConfigs;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
+import com.example.findex.global.error.exception.autosyncconfigs.AutoSyncConfigNotFoundException;
 import com.example.findex.mapper.AutoSyncConfigsMapper;
 import com.example.findex.repository.AutoSyncConfigsRepository;
 import com.example.findex.repository.IndexInfoRepository;
@@ -27,7 +28,7 @@ public class AutoSyncConfigsService {
   @Transactional
   public AutoSyncConfigsDto updateAutoSyncConfigs(Long id, AutoSyncConfigsUpdatedRequest request) {
     AutoSyncConfigs autoSyncConfigs = autoSyncConfigsRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("잘못된 AutoSyncConfigs ID"));
+        .orElseThrow(() -> new AutoSyncConfigNotFoundException());
 
     autoSyncConfigs.updateActive(request.enabled());
 
