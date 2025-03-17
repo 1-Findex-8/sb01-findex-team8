@@ -30,7 +30,7 @@ public class IndexDataController implements IndexDataApi {
   public ResponseEntity<List<IndexPerformanceDto>> getIndexFavoritePerformanceRank(
       @RequestParam String periodType
   ){
-    List<IndexPerformanceDto> dto = indexDataServiceImpl.getInterestIndexPerformance(periodType);
+    List<IndexPerformanceDto> dto = indexDataService.getInterestIndexPerformance(periodType);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 

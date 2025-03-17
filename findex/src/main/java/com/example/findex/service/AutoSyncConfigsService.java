@@ -36,11 +36,11 @@ public class AutoSyncConfigsService {
     return autoSyncConfigsDto;
   }
 
-  @PostConstruct
-  void init() { // 테스트를 위한 임시 데이터 생성
-    IndexInfo indexInfo = new IndexInfo("indexClassification", "indexName",
-        1, LocalDate.now(), BigDecimal.ONE, SourceType.USER, false);
-    AutoSyncConfigs autoSyncConfigs = new AutoSyncConfigs(false, indexInfoRepository.save(indexInfo));
-    autoSyncConfigsRepository.save(autoSyncConfigs);
-  }
+//  @PostConstruct
+//  void init() { // 테스트를 위한 임시 데이터 생성
+//    IndexInfo indexInfo = new IndexInfo("indexClassification", "indexName",
+//        1, LocalDate.now(), BigDecimal.ONE, SourceType.USER, false);
+//    AutoSyncConfigs autoSyncConfigs = new AutoSyncConfigs(false, indexInfoRepository.save(indexInfo));
+//    autoSyncConfigsRepository.save(autoSyncConfigs);
+//  }
 }
