@@ -53,14 +53,14 @@ public class IndexDataController implements IndexDataApi {
   @GetMapping
   @Override
   public ResponseEntity<CursorPageResponseIndexDataDto> getIndexDataList(
-      @RequestParam("indexInfold") long indexInfoId,
-      @RequestParam("startDate") LocalDate startDate,
-      @RequestParam("endDate") LocalDate endDate,
-      @RequestParam("idAfter") long idAfter,
-      @RequestParam("cursor") String cursor,
-      @RequestParam("sortField") String sortField,
-      @RequestParam("sortDirection") String sortDirection,
-      @RequestParam("size") int size
+      @RequestParam(value = "indexInfoId",required = false) long indexInfoId,
+      @RequestParam(value = "startDate",required = false) LocalDate startDate,
+      @RequestParam(value = "endDate",required = false) LocalDate endDate,
+      @RequestParam(value = "idAfter",required = false) long idAfter,
+      @RequestParam(value = "cursor",required = false) String cursor,
+      @RequestParam(value = "sortField",required = false, defaultValue = "baseDate") String sortField,
+      @RequestParam(value = "sortDirection",required = false, defaultValue = "desc") String sortDirection,
+      @RequestParam(value = "size",required = false, defaultValue = "10") int size
   ){
     CursorPageResponseIndexDataDto response = indexDataService.findIndexDataList(
         indexInfoId,startDate,endDate,idAfter,cursor,sortField,sortDirection,size
