@@ -5,10 +5,12 @@ import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.ErrorResponse;
+import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexDataController implements IndexDataApi {
 
   private final IndexDataService indexDataService;
+
+  @GetMapping("/performance/favorite")
+  public ResponseEntity<List<IndexPerformanceDto>> getIndexFavoritePerformanceRank(
+      @RequestParam String periodType
+  ){
+    List<IndexPerformanceDto> dto = indexDataService.getInterestIndexPerformance(periodType);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  }
 
   @PostMapping
   @Override
@@ -49,6 +60,7 @@ public class IndexDataController implements IndexDataApi {
     }
   }
 
+<<<<<<< HEAD
 
   @GetMapping
   @Override
@@ -67,4 +79,19 @@ public class IndexDataController implements IndexDataApi {
     );
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
+=======
+//  @GetMapping
+//  public ResponseEntity<List<CursorPageResponseIndexDataDto>> getIndexDataList(
+//      @RequestParam("indexInfold") long indexInfold,
+//      @RequestParam("startDate")LocalDate startDate,
+//      @RequestParam("endDate") LocalDate endDate,
+//      @RequestParam("idAfter") long idAfter,
+//      @RequestParam("sortField") String sortField,
+//      @RequestParam("sortDirection") String sortDirection,
+//      @RequestParam("size") int size
+//  ){
+//    List<CursorPageResponseIndexDataDto> response = indexDataService.findAllByIndexInfold(indexInfold);
+//    return ResponseEntity.ok(response);
+//  }
+>>>>>>> main
 }

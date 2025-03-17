@@ -10,6 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndexDataRepository extends JpaRepository<IndexData,Long> {
+<<<<<<< HEAD
+=======
+  List<IndexData> findByIndexInfoIdInAndBaseDateIn(List<Long> indexInfoIds, List<LocalDate> beforeDate);
+  
+  IndexData save(IndexData indexData);
+>>>>>>> main
 
   boolean existsByIndexInfoIdAndBaseDate(Long indexInfoId, LocalDate localDate);
 

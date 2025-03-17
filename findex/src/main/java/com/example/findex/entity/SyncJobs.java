@@ -5,40 +5,37 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import java.math.BigDecimal;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "index_info")
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IndexInfo extends BaseEntity {
-
-  @Column(nullable = false)
-  private String indexClassification;
-
-  @Column(nullable = false)
-  private String indexName;
-
-  @Column(nullable = false)
-  private int employeeItemsCount;
-
-  @Column(nullable = false)
-  private LocalDate basePointInTime;
-
-  @Column(nullable = false)
-  private BigDecimal baseIndex;
+public class SyncJobs extends BaseEntity {
 
   @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
-  private SourceType sourceType;
+  private JobType jobType;
+
+  private LocalDate targetDate;
 
   @Column(nullable = false)
-  private boolean favorite = false;
+  private String worker;
+
+  @Column(nullable = false)
+  private LocalDateTime jobTime;
+
+  @Column(nullable = false)
+  @Enumerated(value = EnumType.STRING)
+  private Result result;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "index_info_id", nullable = false)
+  private IndexInfo indexInfo;
 }

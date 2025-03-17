@@ -1,11 +1,18 @@
 HELP.md
-.gradle
-build/
+./.gradle/
+./.idea/
+./gradle
+./gradlew
+./github/
+.idea/
+.gradle/
+gradle/
+gradlew
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+### STS ###fi
 .apt_generated
 .classpath
 .factorypath
