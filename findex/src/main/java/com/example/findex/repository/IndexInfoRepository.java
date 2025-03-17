@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
+  
   IndexInfo save(IndexInfo indexInfo);
 
   Optional<IndexInfo> findById(Long indexInfoId);
