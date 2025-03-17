@@ -35,6 +35,11 @@ public class AutoSyncConfigsService {
     return autoSyncConfigsMapper.toAutoSyncConfigsDto(autoSyncConfigs);
   }
 
+  public String findAutoSyncConfigsList(Long indexInfoId, boolean enabled, Long idAfter,
+      Long cursor, String sortField, String sortDirection, int size) {
+    return null;
+  }
+
   @PostConstruct
   void init() { // 테스트를 위한 임시 데이터 생성
     IndexInfo indexInfo = new IndexInfo("indexClassification", "indexName",
