@@ -1,8 +1,9 @@
 HELP.md
-./findex/.gradle/
-./findex/.idea/
-./findex/build/
-./findex/gradle/
+findex/.gradle/
+findex/.idea/
+findex/build/
+findex/gradle/
+findex/gradlew
 .gradlew
 ./github
 ./idea
