@@ -1,4 +1,4 @@
-package com.example.findex.dto.response;
+package com.example.findex.dto.indexdata.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

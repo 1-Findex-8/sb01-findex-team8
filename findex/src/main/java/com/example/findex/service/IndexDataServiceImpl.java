@@ -1,6 +1,6 @@
 package com.example.findex.service;
 
-import com.example.findex.dto.response.IndexPerformanceDto;
+import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.repository.IndexDataRepository;

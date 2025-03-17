@@ -1,6 +1,6 @@
 package com.example.findex.controller;
 
-import com.example.findex.dto.response.IndexPerformanceDto;
+import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.service.IndexDataServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
