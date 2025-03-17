@@ -1,7 +1,6 @@
 HELP.md
-./.gradle/
-./.idea/
 ./gradle/
+./.idea/
 ./gradlew
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
