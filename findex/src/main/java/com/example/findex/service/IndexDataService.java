@@ -7,7 +7,6 @@ import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
 import com.example.findex.mapper.IndexDataMapper;
-import com.example.findex.repository.CustomIndexDataRepository;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +20,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
