@@ -30,13 +30,15 @@ public class AutoSyncConfigController {
   @GetMapping("")
   public ResponseEntity<?> findAutoSyncConfigsList(
       @RequestParam(value = "indexInfoId", required = false) Long indexInfoId,
-      @RequestParam(value = "enabled", required = false) boolean enabled,
+      @RequestParam(value = "enabled", required = false) Boolean enabled,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
       @RequestParam(value = "cursor", required = false) Long cursor,
       @RequestParam(value = "sortField", defaultValue = "indexInfo.indexName", required = false) String sortField,
       @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection,
       @RequestParam(value = "size", defaultValue = "10", required = false) int size
   ) {
+    autoSyncConfigsService.findAutoSyncConfigsList(
+        indexInfoId, enabled, idAfter, cursor, sortField, sortDirection, size);
     return null;
   }
 }
