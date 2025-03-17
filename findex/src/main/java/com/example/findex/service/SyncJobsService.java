@@ -1,8 +1,12 @@
 package com.example.findex.service;
 
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
+import com.example.findex.dto.syncjobs.response.SyncJobsDto;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,26 +24,38 @@ public class SyncJobsService {
 
   private final RestTemplate restTemplate;
 
-  public GetStockMarketIndexResponse getStockMarketIndexResponse() throws URISyntaxException {
+  public List<SyncJobsDto> syncIndexInfos() {
+    GetStockMarketIndexResponse response = getStockMarketIndexResponse();
+    // 실행 순서
+    // 1. 200 개씩 받아온다. -> totalCount 될 때까지
+      // 보통 1일당 156개
+    // 2. index info로 가공해서 저장한다.
+      // auto sync가 활성화인지 아닌지 확인
+    // 3. sync jobs도 함께 저장
+    return null;
+  }
+
+  public GetStockMarketIndexResponse getStockMarketIndexResponse(){
     String url = BASE_URL + STOCK_MARKET_INDEX
         + "?serviceKey=" + encodingServiceKey
         + "&resultType=json"
         + "&numOfRows=200"
         + "&basDt=20250313";
-    URI uri = new URI(url);
-
-
-//    URI uri12= UriComponentsBuilder.fromUriString(BASE_URL + STOCK_MARKET_INDEX)
-//        .queryParam("numOfRows", "200")
-//        .queryParam("basDt", "20250313")
-//        .queryParam("resultType", "json")
-//        .queryParam("serviceKey", encodingServiceKey) // encoding serviceKey 추가
-//        .build()
-//        .toUri();
+    URI uri = URI.create(url);
 
     GetStockMarketIndexResponse response = restTemplate.getForObject(uri, GetStockMarketIndexResponse.class);
     return response;
   }
 
+  private String getBaseDate() {
+    LocalDate today = LocalDate.now();
 
+    // 전날을 구합니다.
+    LocalDate yesterday = today.minusDays(1);
+
+    // 날짜를 "yyyyMMdd" 형식으로 변환합니다.
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+    String yesterdayStr = yesterday.format(formatter);
+    return yesterdayStr;
+  }
 }
