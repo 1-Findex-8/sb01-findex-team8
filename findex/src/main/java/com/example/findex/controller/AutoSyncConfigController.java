@@ -1,0 +1,27 @@
+package com.example.findex.controller;
+
+import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
+import com.example.findex.service.AutoSyncConfigsService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("api/auto-sync-configs")
+@RequiredArgsConstructor
+public class AutoSyncConfigController {
+
+  private final AutoSyncConfigsService autoSyncConfigsService;
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<AutoSyncConfigsDto> updateAutoSyncConfigs(
+      @PathVariable Long id, @RequestBody AutoSyncConfigsUpdatedRequest request) {
+    return ResponseEntity.ok()
+        .body(autoSyncConfigsService.updateAutoSyncConfigs(id, request));
+  }
+}
