@@ -60,8 +60,6 @@ public class IndexDataController implements IndexDataApi {
     }
   }
 
-<<<<<<< HEAD
-
   @GetMapping
   @Override
   public ResponseEntity<CursorPageResponseIndexDataDto> getIndexDataList(
@@ -79,19 +77,4 @@ public class IndexDataController implements IndexDataApi {
     );
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
-=======
-//  @GetMapping
-//  public ResponseEntity<List<CursorPageResponseIndexDataDto>> getIndexDataList(
-//      @RequestParam("indexInfold") long indexInfold,
-//      @RequestParam("startDate")LocalDate startDate,
-//      @RequestParam("endDate") LocalDate endDate,
-//      @RequestParam("idAfter") long idAfter,
-//      @RequestParam("sortField") String sortField,
-//      @RequestParam("sortDirection") String sortDirection,
-//      @RequestParam("size") int size
-//  ){
-//    List<CursorPageResponseIndexDataDto> response = indexDataService.findAllByIndexInfold(indexInfold);
-//    return ResponseEntity.ok(response);
-//  }
->>>>>>> main
 }
