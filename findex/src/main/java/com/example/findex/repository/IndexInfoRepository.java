@@ -8,8 +8,19 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
+  
+  IndexInfo save(IndexInfo indexInfo);
 
-  Optional<IndexInfo> findById(Long id);
+  Optional<IndexInfo> findById(Long indexInfoId);
+
+  List<IndexInfo> findByIndexClassification(String indexClassification);
+
+  List<IndexInfo> findByIndexName(String indexName);
 
   List<IndexInfo> findByFavorite(boolean favorite);
+
+  boolean existsByIndexClassificationAndIndexName(String classification, String name);
+
+  void deleteById(Long indexInfoId);
+
 }
