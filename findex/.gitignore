@@ -1,17 +1,13 @@
 HELP.md
-findex/.gradle/
-findex/.idea/
-findex/build/
-findex/gradle/
-findex/gradlew
-.gradlew
-./github
-./idea
+./.gradle/
+./.idea/
+./gradle/
+./gradlew
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+### STS ###fi
 .apt_generated
 .classpath
 .factorypath
