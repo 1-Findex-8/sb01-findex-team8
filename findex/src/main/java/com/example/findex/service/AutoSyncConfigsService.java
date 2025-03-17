@@ -28,12 +28,11 @@ public class AutoSyncConfigsService {
   @Transactional
   public AutoSyncConfigsDto updateAutoSyncConfigs(Long id, AutoSyncConfigsUpdatedRequest request) {
     AutoSyncConfigs autoSyncConfigs = autoSyncConfigsRepository.findById(id)
-        .orElseThrow(() -> new AutoSyncConfigNotFoundException());
+        .orElseThrow(AutoSyncConfigNotFoundException::new);
 
     autoSyncConfigs.updateActive(request.enabled());
 
-    AutoSyncConfigsDto autoSyncConfigsDto = autoSyncConfigsMapper.toAutoSyncConfigsDto(autoSyncConfigs);
-    return autoSyncConfigsDto;
+    return autoSyncConfigsMapper.toAutoSyncConfigsDto(autoSyncConfigs);
   }
 
   @PostConstruct

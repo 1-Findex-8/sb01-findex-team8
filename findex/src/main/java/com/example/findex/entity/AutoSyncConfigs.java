@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class AutoSyncConfigs extends BaseEntity {
 
   @Column(nullable = false)
-  private boolean active = true;
+  private boolean active = false;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "index_info_id", nullable = false)

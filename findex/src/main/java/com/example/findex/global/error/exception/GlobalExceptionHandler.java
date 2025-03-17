@@ -1,7 +1,6 @@
 package com.example.findex.global.error.exception;
 
 import com.example.findex.global.error.ErrorResponse;
-import com.example.findex.global.error.exception.BusinessException;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
