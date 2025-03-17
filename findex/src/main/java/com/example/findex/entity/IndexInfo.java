@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class IndexInfo extends BaseEntity {
 
   @Column(nullable = false)
