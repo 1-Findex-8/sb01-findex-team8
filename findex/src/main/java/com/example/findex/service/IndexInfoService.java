@@ -23,15 +23,15 @@ public class IndexInfoService {
     if (indexInfoRepository.existsByIndexClassificationAndIndexName(request.indexClassification(), request.indexName())) {
       throw new DataIntegrityViolationException("지수 분류명과 지수명 조합은 중복될 수 없습니다.");
     }
-    IndexInfo indexInfo = indexInfoMapper.toEntity(request.indexClassification(),
+    IndexInfo indexInfo = new IndexInfo(request.indexClassification(),
         request.indexName(),
         request.employedItemsCount(),
         request.basePointInTime(),
         request.baseIndex(),
         sourceType,
         favorite);
-    indexInfoRepository.save(indexInfo);
-    return indexInfoMapper.toDto(indexInfo);
+
+    return indexInfoMapper.toDto(indexInfoRepository.save(indexInfo));
   }
 
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
