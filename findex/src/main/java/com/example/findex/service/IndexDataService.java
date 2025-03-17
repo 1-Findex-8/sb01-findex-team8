@@ -73,7 +73,7 @@ public class IndexDataService {
 
     // DTO 변환
     List<IndexDataDto> content = indexDataPage.getContent().stream()
-        .map(this::convertToDto)
+        .map(indexDataMapper::toDto)
         .collect(Collectors.toList());
 
     // 커서 계산
@@ -93,23 +93,5 @@ public class IndexDataService {
   }
   private String generateNextCursor(Long lastId) {
     return Base64.getEncoder().encodeToString(lastId.toString().getBytes(StandardCharsets.UTF_8));
-  }
-
-  private IndexDataDto convertToDto(IndexData indexData) {
-    return new IndexDataDto(
-        indexData.getId(),
-        indexData.getIndexInfo().getId(),
-        indexData.getBaseDate(),
-        indexData.getSourceType(),
-        indexData.getMarketPrice(),
-        indexData.getClosingPrice(),
-        indexData.getHighPrice(),
-        indexData.getLowPrice(),
-        indexData.getVersus(),
-        indexData.getFluctuationRate(),
-        indexData.getTradingQuantity(),
-        indexData.getTradingPrice(),
-        indexData.getMarketTotalAmount()
-    );
   }
 }
