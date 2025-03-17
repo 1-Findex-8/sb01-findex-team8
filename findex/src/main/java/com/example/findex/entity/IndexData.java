@@ -8,16 +8,23 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name="index_data")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class IndexData extends BaseEntity {
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "index_info_id", nullable = false)
+  private IndexInfo indexInfo;
 
   @Column(nullable = false)
   private LocalDate baseDate;
@@ -39,7 +46,7 @@ public class IndexData extends BaseEntity {
   private BigDecimal lowPrice;
 
   @Column(nullable = false)
-  private BigDecimal variation;
+  private BigDecimal variation; //dto에서 versus로 사용
 
   @Column(nullable = false)
   private BigDecimal fluctuationRate;
@@ -48,12 +55,10 @@ public class IndexData extends BaseEntity {
   private Long tradingQuantity;
 
   @Column(nullable = false)
-  private BigDecimal tradingPrice;
+  private Long tradingPrice;
 
   @Column(nullable = false)
-  private BigDecimal marketCapitalization;
+  private Long marketCapitalization; //dto 에서 marketTotalAmount
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "index_info_id", nullable = false)
-  private IndexInfo indexInfo;
 }
+
