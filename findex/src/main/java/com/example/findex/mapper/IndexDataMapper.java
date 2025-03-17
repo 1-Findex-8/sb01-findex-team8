@@ -27,11 +27,11 @@ public class IndexDataMapper {
         indexData.getClosingPrice(),
         indexData.getHighPrice(),
         indexData.getLowPrice(),
-        indexData.getVariation(),
+        indexData.getVersus(),
         indexData.getFluctuationRate(),
         indexData.getTradingQuantity(),
         indexData.getTradingPrice(),
-        indexData.getMarketCapitalization()
+        indexData.getMarketTotalAmount()
     );
   }
 
