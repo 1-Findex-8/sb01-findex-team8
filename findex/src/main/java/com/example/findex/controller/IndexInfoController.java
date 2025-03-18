@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +35,15 @@ public class IndexInfoController {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(indexInfoService.create(request, sourceType, favorite));
+  }
+
+  @PatchMapping("{id}")
+  public ResponseEntity<IndexInfoDto> updateIndexInfoById(
+      @PathVariable Long id,
+      @RequestParam UpdateIndexInfoRequest request) {
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(indexInfoService.update(id, request));
   }
 
   @GetMapping("{id}")
