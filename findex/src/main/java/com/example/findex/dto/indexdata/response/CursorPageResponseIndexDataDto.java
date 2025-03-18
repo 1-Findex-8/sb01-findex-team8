@@ -9,19 +9,19 @@ public record CursorPageResponseIndexDataDto(
     @Schema(description = "페이지 내용")
     List<IndexDataDto> content, // 페이지 내용
 
-    @Schema(description = "다음 페이지 커서")
+    @Schema(description = "다음 페이지 커서",example = "eyJpZCI6MjB9")
     String nextCursor, // 다음 페이지 커서
 
-    @Schema(description = "마지막 요소의 ID")
+    @Schema(description = "마지막 요소의 ID",example = "eyJpZCI6MjB9")
     Long nextIdAfter, // 마지막 요소의 ID
 
-    @Schema(description = "페이지 크기")
+    @Schema(description = "페이지 크기",example = "10")
     int size, // 페이지 크기
 
-    @Schema(description = "총 요소 수")
+    @Schema(description = "총 요소 수",example = "100")
     Long totalElements, // 총 요소 수
 
-    @Schema(description = "다음 페이지 여부")
+    @Schema(description = "다음 페이지 여부",example = "true")
     boolean hasNext // 다음 페이지 여부
 ) {
 
