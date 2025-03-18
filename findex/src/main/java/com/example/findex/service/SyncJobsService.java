@@ -119,7 +119,7 @@ public class SyncJobsService {
       indexInfo.updateBasePointInTime(getLocalDate(item.basPntm()));
       indexInfo.updateEmployeeItemsCount(item.epyItmsCnt());
 
-      return indexInfoRepository.save(indexInfo);
+      return indexInfo;
     }
 
     // 기존 indexInfo 가 없다면 새로 저장
@@ -134,7 +134,6 @@ public class SyncJobsService {
             false
         )
     );
-
   }
 
   private List<SyncJobs> callApi(IndexInfo indexInfo, IndexDataSyncRequest request, String worker) {
@@ -161,7 +160,41 @@ public class SyncJobsService {
   }
 
   private SyncJobs saveIndexDataAndSyncJobs(IndexInfo indexInfo, Item item, String worker) {
-    IndexData indexData = indexDataRepository.save(
+    IndexData indexData = getIndexData(indexInfo, item);
+
+    boolean exist = indexDataRepository.existsById(indexData.getId());
+
+    return syncJobRepository.save(
+        new SyncJobs(
+            JobType.INDEX_DATA,
+            indexData.getBaseDate(),
+            worker,
+            LocalDateTime.now(),
+            exist ? Result.SUCCESS : Result.FAILED,
+            indexInfo
+        )
+    );
+  }
+
+  private IndexData getIndexData(IndexInfo indexInfo, Item item) {
+    Optional<IndexData> indexDataOptional =
+        indexDataRepository.findByIndexInfoAndBaseDate(indexInfo, getLocalDate(item.basDt()));
+
+    if (indexDataOptional.isPresent()) {
+      IndexData indexData = indexDataOptional.get();
+
+      indexData.updateMarketPrice(BigDecimal.valueOf(item.mkp()));
+      indexData.updateClosingPrice(BigDecimal.valueOf(item.clpr()));
+      indexData.updateHighPrice(BigDecimal.valueOf(item.hipr()));
+      indexData.updateLowPrice(BigDecimal.valueOf(item.lopr()));
+      indexData.updateTradingQuantity(item.trqu());
+      indexData.updateVariation(BigDecimal.valueOf(item.vs()));
+      indexData.updateFluctuationRate(BigDecimal.valueOf(item.fltRt()));
+
+      return indexData;
+    }
+
+    return indexDataRepository.save(
         new IndexData(
             indexInfo,
             getLocalDate(item.basDt()),
@@ -175,19 +208,6 @@ public class SyncJobsService {
             item.trqu(),
             item.trPrc(),
             item.lstgMrktTotAmt()
-        )
-    );
-
-    boolean exist = indexDataRepository.existsById(indexData.getId());
-
-    return syncJobRepository.save(
-        new SyncJobs(
-            JobType.INDEX_DATA,
-            indexData.getBaseDate(),
-            worker,
-            LocalDateTime.now(),
-            exist ? Result.SUCCESS : Result.FAILED,
-            indexInfo
         )
     );
   }

@@ -60,5 +60,32 @@ public class IndexData extends BaseEntity {
   @Column(nullable = false)
   private Long marketCapitalization; //dto 에서 marketTotalAmount
 
+  public void updateMarketPrice(BigDecimal marketPrice) {
+    this.marketPrice = marketPrice;
+  }
+
+  public void updateClosingPrice(BigDecimal closingPrice) {
+    this.closingPrice = closingPrice;
+  }
+
+  public void updateHighPrice(BigDecimal highPrice) {
+    this.highPrice = highPrice;
+  }
+
+  public void updateLowPrice(BigDecimal lowPrice) {
+    this.lowPrice = lowPrice;
+  }
+
+  public void updateVariation(BigDecimal variation) {
+    this.variation = variation;
+  }
+
+  public void updateFluctuationRate(BigDecimal fluctuationRate) {
+    this.fluctuationRate = fluctuationRate;
+  }
+
+  public void updateTradingQuantity(Long tradingQuantity) {
+    this.tradingQuantity = tradingQuantity;
+  }
 }
 
