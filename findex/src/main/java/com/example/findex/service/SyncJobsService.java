@@ -21,6 +21,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -39,6 +40,7 @@ public class SyncJobsService {
 
   private final SyncJobsMapper syncJobsMapper;
 
+  @Transactional
   public List<SyncJobsDto> syncIndexInfos() {
     // 실행 순서
     // 1. 200 개씩 받아온다.
@@ -96,10 +98,8 @@ public class SyncJobsService {
   private String getBaseDate() {
     LocalDate today = LocalDate.now();
 
-    // 전날을 구합니다.
     LocalDate yesterday = today.minusDays(1);
 
-    // 날짜를 "yyyyMMdd" 형식으로 변환합니다.
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     return yesterday.format(formatter);
   }
