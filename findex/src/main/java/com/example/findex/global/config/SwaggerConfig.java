@@ -1,4 +1,4 @@
-package com.example.findex.config;
+package com.example.findex.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
