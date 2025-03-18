@@ -2,7 +2,6 @@ package com.example.findex.global.error.exception;
 
 import com.example.findex.global.error.ErrorCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class BusinessException extends RuntimeException {

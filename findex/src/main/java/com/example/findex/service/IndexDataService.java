@@ -3,42 +3,32 @@ package com.example.findex.service;
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 import com.example.findex.dto.indexdata.response.ChartDataPoint;
-import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
+import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.exception.IndexInfo.IndexInfoNotFoundException;
-import com.example.findex.mapper.IndexDataMapper;
-import com.example.findex.repository.IndexDataRepository;
-import com.example.findex.repository.IndexInfoRepository;
-import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
 import com.example.findex.global.error.ErrorCode;
-import com.example.findex.global.error.exception.BusinessException;
 import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
 import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -219,7 +209,8 @@ public class IndexDataService {
     IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
         .orElseThrow(IndexInfoNotFoundException::new);
 
-    List<IndexInfo> indexInfoList = indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
+    List<IndexInfo> indexInfoList =
+        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification()); // 수정 필요
 
     // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
     List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
