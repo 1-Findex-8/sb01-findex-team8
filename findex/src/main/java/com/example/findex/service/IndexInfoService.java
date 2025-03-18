@@ -48,7 +48,11 @@ public class IndexInfoService {
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
     IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId).orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND));
 
-    // TODO: update 로직
+    indexInfo.setEmployeeItemsCount(request.employedItemsCount());
+    indexInfo.setBasePointInTime(request.basePointInTime());
+    indexInfo.setBaseIndex(request.baseIndex());
+    indexInfo.setFavorite(request.favorite());
+
     return indexInfoMapper.toDto(indexInfoRepository.save(indexInfo));
   }
 
