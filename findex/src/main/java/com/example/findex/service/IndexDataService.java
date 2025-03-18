@@ -7,6 +7,8 @@ import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
+import com.example.findex.global.error.ErrorCode;
+import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
@@ -41,11 +43,10 @@ public class IndexDataService {
     //중복 체크
     if (indexDataRepository.existsByIndexInfoIdAndBaseDate(request.indexInfoId(),
         request.baseDate())) {
-      throw new DataIntegrityViolationException("지수 및 날짜 조합이 이미 존재합니다.");
+      throw new DataIntegrityViolationException(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION.getMessage());
     }
     IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
-        .orElseThrow(() -> new NoSuchElementException(
-            "IndexInfo with id " + request.indexInfoId() + " not found"));
+        .orElseThrow(() -> new IndexDataNoSuchElementException(ErrorCode.INDEX_NOT_FOUND.getMessage()));
 
     //사용자가 생성
     IndexData indexData = new IndexData(
