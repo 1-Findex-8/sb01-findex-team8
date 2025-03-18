@@ -14,9 +14,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IndexDataRepository extends JpaRepository<IndexData,Long> , IndexDataRepositoryCustom {
+  
   List<IndexData> findByIndexInfoIdInAndBaseDateIn(List<Long> indexInfoIds, List<LocalDate> beforeDate);
 
   boolean existsByIndexInfoIdAndBaseDate(Long indexInfoId, LocalDate localDate);
+
+  Optional<IndexData> findByIndexInfoAndBaseDate(IndexInfo indexInfo, LocalDate baseDate);
 
   List<IndexData> findByIndexInfoInAndBaseDateIn(List<IndexInfo> indexInfoList, List<LocalDate> beforeDate);
 

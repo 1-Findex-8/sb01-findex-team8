@@ -43,4 +43,16 @@ public class IndexInfo extends BaseEntity {
 
   @Column(nullable = false)
   private boolean favorite = false;
+
+  public void updateEmployeeItemsCount(int employeeItemsCount) {
+    this.employeeItemsCount = employeeItemsCount;
+  }
+
+  public void updateBasePointInTime(LocalDate basePointInTime) {
+    this.basePointInTime = basePointInTime;
+  }
+
+  public void updateBaseIndex(BigDecimal baseIndex) {
+    this.baseIndex = baseIndex;
+  }
 }

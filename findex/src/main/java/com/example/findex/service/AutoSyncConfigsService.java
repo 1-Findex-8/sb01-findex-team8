@@ -10,7 +10,6 @@ import com.example.findex.global.error.exception.autosyncconfigs.AutoSyncConfigN
 import com.example.findex.mapper.AutoSyncConfigsMapper;
 import com.example.findex.repository.IndexInfoRepository;
 import com.example.findex.repository.autosyncconfigs.AutoSyncConfigsRepository;
-import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +66,7 @@ public class AutoSyncConfigsService {
     return sortField;
   }
 
-  @PostConstruct
+//  @PostConstruct
   @Transactional
   public void init() { // 테스트를 위한 임시 데이터 생성
     for (int i = 0; i < 20; i++) {
