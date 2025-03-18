@@ -14,6 +14,7 @@ import com.example.findex.mapper.SyncJobsMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
 import com.example.findex.repository.SyncJobRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +50,7 @@ public class SyncJobsService {
   private final SyncJobsMapper syncJobsMapper;
 
   @Transactional
-  public List<SyncJobsDto> syncIndexInfos() {
+  public List<SyncJobsDto> syncIndexInfos(HttpServletRequest httpServletRequest) {
     // 실행 순서
     // 1. 200 개씩 받아온다.
       // 보통 1일당 156개
@@ -74,12 +76,13 @@ public class SyncJobsService {
 
           // 3. sync jobs도 함께 저장
           boolean exist = indexInfoRepository.existsById(indexInfo.getId());
+          String worker = getIp(httpServletRequest);
 
           SyncJobs syncJobs = syncJobRepository.save(
               new SyncJobs(
                   JobType.INDEX_INFO,
                   null,
-                  "system",
+                  worker,
                   LocalDateTime.now(),
                   exist ? Result.SUCCESS : Result.FAILED,
                   indexInfo
@@ -92,7 +95,8 @@ public class SyncJobsService {
   }
 
   @Transactional
-  public List<SyncJobsDto> syncIndexData(IndexDataSyncRequest request) {
+  public List<SyncJobsDto> syncIndexData(
+      IndexDataSyncRequest request, HttpServletRequest httpServletRequest) {
     // 실행 순서
     // 1. indexInfoId 로 조회
     List<IndexInfo> indexInfos = request.indexInfoIds().stream()
@@ -102,15 +106,16 @@ public class SyncJobsService {
         .toList();
 
     // 2. 조회 결과를 바탕으로 index name 추출 후 api 요청
+    String worker = getIp(httpServletRequest);
     List<SyncJobs> syncJobsList = new ArrayList<>();
     indexInfos.forEach(
-      indexInfo -> syncJobsList.addAll(callApi(indexInfo, request))
+      indexInfo -> syncJobsList.addAll(callApi(indexInfo, request, worker))
     );
 
     return syncJobsMapper.toSyncJobsDtoList(syncJobsList);
   }
 
-  private List<SyncJobs> callApi(IndexInfo indexInfo, IndexDataSyncRequest request) {
+  private List<SyncJobs> callApi(IndexInfo indexInfo, IndexDataSyncRequest request, String worker) {
     String indexName = indexInfo.getIndexName();
     LocalDate baseDateFrom = request.baseDateFrom();
     LocalDate baseDateTo = request.baseDateTo();
@@ -129,13 +134,13 @@ public class SyncJobsService {
 
     // 3. indexData, syncjob 저장
     List<SyncJobs> syncJobsList = items.stream()
-        .map(item -> saveIndexDataAndSyncJobs(indexInfo, item))
+        .map(item -> saveIndexDataAndSyncJobs(indexInfo, item, worker))
         .toList();
 
     return syncJobsList;
   }
 
-  private SyncJobs saveIndexDataAndSyncJobs(IndexInfo indexInfo, Item item) {
+  private SyncJobs saveIndexDataAndSyncJobs(IndexInfo indexInfo, Item item, String worker) {
     IndexData indexData = indexDataRepository.save(
         new IndexData(
             indexInfo,
@@ -159,7 +164,7 @@ public class SyncJobsService {
         new SyncJobs(
             JobType.INDEX_DATA,
             indexData.getBaseDate(),
-            "system",
+            worker,
             LocalDateTime.now(),
             exist ? Result.SUCCESS : Result.FAILED,
             indexInfo
@@ -203,5 +208,23 @@ public class SyncJobsService {
 
   private String formatLocalDate(LocalDate localDate) {
     return localDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+  }
+
+  private String getIp(HttpServletRequest request) {
+    List<String> headerList = Arrays.asList(
+        "X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP",
+        "HTTP_X_FORWARDED_FOR");
+    String ip = null;
+
+    for (String header : headerList) {
+      if (ip == null) {
+        ip = request.getHeader(header);
+      }
+    }
+
+    if (ip == null) {
+      ip = request.getRemoteAddr();
+    }
+    return ip;
   }
 }

@@ -4,6 +4,7 @@ import com.example.findex.dto.syncjobs.request.IndexDataSyncRequest;
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
 import com.example.findex.service.SyncJobsService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +27,15 @@ public class SyncJobsController {
   }
 
   @PostMapping("/index-infos")
-  public ResponseEntity<List<SyncJobsDto>> syncIndexInfos() {
+  public ResponseEntity<List<SyncJobsDto>> syncIndexInfos(HttpServletRequest request) {
     return ResponseEntity.ok()
-        .body(syncJobsService.syncIndexInfos());
+        .body(syncJobsService.syncIndexInfos(request));
   }
 
   @PostMapping("/index-data")
-  public ResponseEntity<List<SyncJobsDto>> syncIndexData(@RequestBody IndexDataSyncRequest request) {
+  public ResponseEntity<List<SyncJobsDto>> syncIndexData(
+      @RequestBody IndexDataSyncRequest request, HttpServletRequest httpServletRequest) {
     return ResponseEntity.ok()
-        .body(syncJobsService.syncIndexData(request));
+        .body(syncJobsService.syncIndexData(request, httpServletRequest));
   }
 }
