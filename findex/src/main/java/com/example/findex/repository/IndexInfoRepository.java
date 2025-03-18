@@ -13,9 +13,11 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
 
   Optional<IndexInfo> findById(Long indexInfoId);
 
-  List<IndexInfo> findByIndexClassification(String indexClassification);
+  List<IndexInfo> findAll();
 
-  List<IndexInfo> findByIndexName(String indexName);
+  List<IndexInfo> findByIndexClassificationContaining(String indexClassification);
+
+  List<IndexInfo> findByIndexNameContaining(String indexName);
 
   List<IndexInfo> findByFavorite(boolean favorite);
 
