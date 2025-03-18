@@ -5,6 +5,7 @@ import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 import com.example.findex.dto.indexdata.response.ErrorResponse;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
+import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
 import java.util.NoSuchElementException;
 import java.util.List;
@@ -31,6 +32,15 @@ public class IndexDataController implements IndexDataApi {
       @RequestParam String periodType
   ){
     List<IndexPerformanceDto> dto = indexDataService.getInterestIndexPerformance(periodType);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  }
+
+  @GetMapping("/performance/rank")
+  public ResponseEntity<List<RankedIndexPerformanceDto>> getIndexPerformanceRank(
+      @RequestParam String periodType,
+      @RequestParam int indexInfoId,
+      @RequestParam int limit) {
+    List<RankedIndexPerformanceDto> dto = indexDataService.getIndexPerformanceRank(periodType, indexInfoId, limit);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 

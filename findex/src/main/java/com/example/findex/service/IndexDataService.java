@@ -3,19 +3,24 @@ package com.example.findex.service;
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
+import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
+import com.example.findex.global.error.exception.IndexInfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -121,5 +126,45 @@ public class IndexDataService {
       ));
     }
     return Optional.empty();
+  }
+
+  public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, int indexInfoId, int limit) {
+
+    LocalDate beforeDate = calculateStartDate(periodType);
+    LocalDate today = LocalDate.now();
+
+    IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
+        .orElseThrow(IndexInfoNotFoundException::new);
+
+    List<IndexInfo> indexInfoList = indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
+
+    // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
+    List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
+
+    // 날짜별로 데이터를 매핑
+    Map<Long, IndexData> beforeDataMap = indexDataList.stream()
+        .filter(data -> data.getBaseDate().equals(beforeDate))
+        .collect(Collectors.toMap(data -> data.getIndexInfo().getId(), Function.identity()));
+
+    Map<Long, IndexData> currentDataMap = indexDataList.stream()
+        .filter(data -> data.getBaseDate().equals(today))
+        .collect(Collectors.toMap(data -> data.getIndexInfo().getId(), Function.identity()));
+
+    // IndexPerformanceDto 생성 및 정렬
+    List<IndexPerformanceDto> performanceList = indexInfoList.stream()
+        .map(indexInfo -> createIndexPerformanceDto(indexInfo, beforeDataMap, currentDataMap))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .sorted(Comparator.comparingDouble(IndexPerformanceDto::fluctuationRate).reversed()) // 등락률 기준 정렬
+        .limit(limit)
+        .toList();
+
+    // rank 추가 후 RankedIndexPerformanceDto로 변환
+    List<RankedIndexPerformanceDto> rankedList = IntStream.range(0, performanceList.size())
+        .mapToObj(i -> new RankedIndexPerformanceDto(performanceList.get(i), i + 1))
+        .limit(limit)
+        .collect(Collectors.toList());
+
+    return rankedList;
   }
 }

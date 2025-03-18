@@ -8,7 +8,7 @@ public enum ErrorCode {
   USER_NOT_FOUND(400, "유저를 찾지 못했습니다", "잘못된 ID 입니다."),
 
   // indexinfo
-
+  INDEXINFO_NOT_FOUND(404, "지수 정보를 찾지 못했습니다.","존재하지 않는 ID입니다."),
   // indexdata
 
   // syncjobs
