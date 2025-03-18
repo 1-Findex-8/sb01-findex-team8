@@ -1,11 +1,11 @@
 package com.example.findex.service;
 
-import com.example.findex.dto.IndexInfo.CreateIndexInfoRequest;
-import com.example.findex.dto.IndexInfo.FindIndexInfoRequest;
-import com.example.findex.dto.IndexInfo.IndexInfoDto;
-import com.example.findex.dto.IndexInfo.SortDirectionType;
-import com.example.findex.dto.IndexInfo.SortFieldType;
-import com.example.findex.dto.IndexInfo.UpdateIndexInfoRequest;
+import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
+import com.example.findex.dto.indexinfo.FindIndexInfoRequest;
+import com.example.findex.dto.indexinfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.SortDirectionType;
+import com.example.findex.dto.indexinfo.SortFieldType;
+import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
 import com.example.findex.global.error.ErrorCode;
@@ -15,7 +15,6 @@ import com.example.findex.repository.IndexInfoRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +46,10 @@ public class IndexInfoService {
   }
 
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
-    IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId).orElseThrow(() -> new NoSuchElementException("id: " + indexInfoId));
+    IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId).orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND));
 
     // TODO: update 로직
-
-    indexInfoRepository.save(indexInfo);
-    return indexInfoMapper.toDto(indexInfo);
+    return indexInfoMapper.toDto(indexInfoRepository.save(indexInfo));
   }
 
   public IndexInfoDto findById(Long indexInfoId) {
@@ -62,6 +59,8 @@ public class IndexInfoService {
   }
 
   public List<IndexInfoDto> findAndSort(FindIndexInfoRequest request) {
+    // TODO: 수정) 조회 조건이 여러 개인 경우 모든 조건을 만족한 결과로 조회합니다.
+
     Set<IndexInfoDto> infoSet = indexInfoRepository.findByFavorite(request.favorite()).stream().map(
         indexInfoMapper::toDto).collect(
         Collectors.toSet());
@@ -91,7 +90,7 @@ public class IndexInfoService {
       }
     }
 
-    else if (request.sortField().equals(SortFieldType.indexName)) {
+    if (request.sortField().equals(SortFieldType.indexName)) {
       if (request.sortDirection().equals(SortDirectionType.asc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::indexName)));
       }
@@ -100,7 +99,7 @@ public class IndexInfoService {
       }
     }
 
-    else if (request.sortField().equals(SortFieldType.employedItemsCount)) {
+    if (request.sortField().equals(SortFieldType.employedItemsCount)) {
       if (request.sortDirection().equals(SortDirectionType.asc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::employeeItemsCount)));
       }
@@ -108,6 +107,8 @@ public class IndexInfoService {
         infoList.sort((Comparator.comparing(IndexInfoDto::employeeItemsCount).reversed()));
       }
     }
+
+    // TODO: 페이지네이션 추가
 
     return infoList;
   }
