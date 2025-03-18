@@ -97,6 +97,8 @@ public class SyncJobsService {
   @Transactional
   public List<SyncJobsDto> syncIndexData(
       IndexDataSyncRequest request, HttpServletRequest httpServletRequest) {
+    if (request.indexInfoIds().isEmpty()) return new ArrayList<>();
+
     // 실행 순서
     // 1. indexInfoId 로 조회
     List<IndexInfo> indexInfos = request.indexInfoIds().stream()
@@ -133,11 +135,9 @@ public class SyncJobsService {
     } while (currentCount != response.response().body().totalCount());
 
     // 3. indexData, syncjob 저장
-    List<SyncJobs> syncJobsList = items.stream()
+    return items.stream()
         .map(item -> saveIndexDataAndSyncJobs(indexInfo, item, worker))
         .toList();
-
-    return syncJobsList;
   }
 
   private SyncJobs saveIndexDataAndSyncJobs(IndexInfo indexInfo, Item item, String worker) {
