@@ -8,4 +8,8 @@ public class AutoSyncConfigNotFoundException extends BusinessException {
   public AutoSyncConfigNotFoundException() {
     super(ErrorCode.AUTOSYNCCONFIGS_NOT_FOUND);
   }
+
+  public AutoSyncConfigNotFoundException(String details) {
+    super(ErrorCode.AUTOSYNCCONFIGS_NOT_FOUND, details);
+  }
 }
