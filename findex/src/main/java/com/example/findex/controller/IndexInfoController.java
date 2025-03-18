@@ -1,8 +1,9 @@
 package com.example.findex.controller;
 
-import com.example.findex.dto.IndexInfo.CreateIndexInfoRequest;
-import com.example.findex.dto.IndexInfo.FindIndexInfoRequest;
-import com.example.findex.dto.IndexInfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
+import com.example.findex.dto.indexinfo.FindIndexInfoRequest;
+import com.example.findex.dto.indexinfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.SourceType;
 import com.example.findex.service.IndexInfoService;
 import java.util.List;
@@ -43,7 +44,8 @@ public class IndexInfoController {
   }
 
   @GetMapping
-  public ResponseEntity<List<IndexInfoDto>> findIndexInfoAndSort(@RequestBody FindIndexInfoRequest request) {
+  public ResponseEntity<List<IndexInfoDto>> findIndexInfoAndSort(
+      @RequestBody FindIndexInfoRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(indexInfoService.findAndSort(request));
