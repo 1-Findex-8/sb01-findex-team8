@@ -43,16 +43,8 @@ public class IndexDataController implements IndexDataApi {
   @PostMapping
   @Override
   public ResponseEntity<?> createIndexData(@RequestBody IndexDataCreateRequest indexDataCreateRequest) {
-    try{
-      IndexDataDto indexDto = indexDataService.create(indexDataCreateRequest);
-      return ResponseEntity.status(HttpStatus.CREATED).body(indexDto);
-    }catch (DataIntegrityViolationException e) {
-      throw new IndexDataIntegrityViolationException(ErrorCode.INDEX_INTERNAL_SERVER_ERROR.getMessage());
-    } catch (NoSuchElementException e) {
-      throw new IndexDataNoSuchElementException(ErrorCode.INDEX_NOT_FOUND.getMessage());
-    } catch (Exception e) {
-      throw new IndexDataInternalServerErrorException(ErrorCode.INDEX_INTERNAL_SERVER_ERROR.getMessage());
-    }
+    IndexDataDto indexDto = indexDataService.create(indexDataCreateRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(indexDto);
   }
 
   @GetMapping

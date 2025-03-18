@@ -8,6 +8,7 @@ import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
 import com.example.findex.global.error.ErrorCode;
+import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
@@ -43,7 +44,7 @@ public class IndexDataService {
     //중복 체크
     if (indexDataRepository.existsByIndexInfoIdAndBaseDate(request.indexInfoId(),
         request.baseDate())) {
-      throw new DataIntegrityViolationException(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION.getMessage());
+      throw new IndexDataInternalServerErrorException(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION.getMessage());
     }
     IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
         .orElseThrow(() -> new IndexDataNoSuchElementException(ErrorCode.INDEX_NOT_FOUND.getMessage()));
