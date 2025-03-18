@@ -15,6 +15,7 @@ import com.example.findex.repository.IndexInfoRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -59,33 +60,38 @@ public class IndexInfoService {
   }
 
   public List<IndexInfoDto> findAndSort(FindIndexInfoRequest request) {
-    // TODO: 수정) 조회 조건이 여러 개인 경우 모든 조건을 만족한 결과로 조회합니다.
+    // 조건 필터링
+    List<IndexInfoDto> infoList = new ArrayList<>(
+        indexInfoRepository.findByFavorite(request.favorite())
+            .stream()
+            .map(indexInfoMapper::toDto)
+            .toList()
+    );
 
-    Set<IndexInfoDto> infoSet = indexInfoRepository.findByFavorite(request.favorite()).stream().map(
-        indexInfoMapper::toDto).collect(
-        Collectors.toSet());
+    List<IndexInfoDto> classificationList = Optional.ofNullable(request.indexClassification())
+        .map(indexClassification -> new ArrayList<>(indexInfoRepository.findByIndexClassificationContaining(indexClassification)
+            .stream()
+            .map(indexInfoMapper::toDto)
+            .toList()))
+        .orElse(new ArrayList<>());
 
-    if (request.indexClassification() == null) {
-      infoSet.addAll(indexInfoRepository.findAll().stream().map(indexInfoMapper::toDto).collect(Collectors.toSet()));
-    } else {
-      infoSet.addAll(indexInfoRepository.findByIndexClassificationContaining(
-          request.indexClassification()).stream().map(indexInfoMapper::toDto).collect(Collectors.toSet()));
+    List<IndexInfoDto> nameList = Optional.ofNullable(request.indexName())
+        .map(indexName -> new ArrayList<>(indexInfoRepository.findByIndexNameContaining(indexName)
+            .stream()
+            .map(indexInfoMapper::toDto)
+            .toList()))
+        .orElse(new ArrayList<>());
+
+    if (!classificationList.isEmpty() && !nameList.isEmpty()) {
+      infoList.retainAll(classificationList);
+      infoList.retainAll(nameList);
     }
 
-    if (request.indexName() == null) {
-      infoSet.addAll(indexInfoRepository.findAll().stream().map(indexInfoMapper::toDto).collect(Collectors.toSet()));
-    } else {
-      infoSet.addAll(indexInfoRepository.findByIndexNameContaining(request.indexName()).stream().map(indexInfoMapper::toDto).collect(
-        Collectors.toSet()));
-    }
-
-    List<IndexInfoDto> infoList = new ArrayList<>(infoSet.stream().toList());
-
+    // 정렬
     if (request.sortField().equals(SortFieldType.indexClassification)) {
       if (request.sortDirection().equals(SortDirectionType.asc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::indexClassification)));
-      }
-      else if (request.sortDirection().equals(SortDirectionType.desc)) {
+      } else if (request.sortDirection().equals(SortDirectionType.desc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::indexClassification).reversed()));
       }
     }
@@ -93,8 +99,7 @@ public class IndexInfoService {
     if (request.sortField().equals(SortFieldType.indexName)) {
       if (request.sortDirection().equals(SortDirectionType.asc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::indexName)));
-      }
-      else if (request.sortDirection().equals(SortDirectionType.desc)) {
+      } else if (request.sortDirection().equals(SortDirectionType.desc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::indexName).reversed()));
       }
     }
@@ -102,13 +107,14 @@ public class IndexInfoService {
     if (request.sortField().equals(SortFieldType.employedItemsCount)) {
       if (request.sortDirection().equals(SortDirectionType.asc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::employeeItemsCount)));
-      }
-      else if (request.sortDirection().equals(SortDirectionType.desc)) {
+      } else if (request.sortDirection().equals(SortDirectionType.desc)) {
         infoList.sort((Comparator.comparing(IndexInfoDto::employeeItemsCount).reversed()));
       }
     }
 
     // TODO: 페이지네이션 추가
+    // 페이지네이션
+
 
     return infoList;
   }
