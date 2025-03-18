@@ -36,7 +36,7 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
 
     //endDate 조건
     if(endDate != null) {
-      builder.and(indexData.baseDate.goe(endDate));
+      builder.and(indexData.baseDate.loe(endDate));
     }
 
     //idAfter 조건
@@ -61,8 +61,8 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
     }
 
     // 페이징 처리
-    query.offset(pageable.getOffset());
-    query.limit(pageable.getPageSize());
+    query.offset(pageable.getOffset()); // 조회 시작 위치
+    query.limit(pageable.getPageSize()); // 조회할 데이터 건수
 
     return query.fetch();
   }
