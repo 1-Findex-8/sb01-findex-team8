@@ -8,6 +8,8 @@ import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
 import com.example.findex.global.error.ErrorCode;
+import com.example.findex.global.error.exception.BusinessException;
+import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
 import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
 import com.example.findex.mapper.IndexDataMapper;
@@ -72,6 +74,11 @@ public class IndexDataService {
   public CursorPageResponseIndexDataDto findIndexDataList(Long indexInfoId, LocalDate startDate,
       LocalDate endDate, Long idAfter, String cursor, String sortField,
       String sortDirection, int size) {
+
+    //정렬필드가 sourceType이면 예외 발생
+    if("sourceType".equalsIgnoreCase(sortField)) {
+      throw new IndexDataBadRequestException(ErrorCode.INDEX_BAD_REQUEST.getMessage());
+    }
 
     //커서값이 있으면 페이지 번호 계산
     int page = (cursor != null && !cursor.isEmpty()) ? getPageFromCursor(cursor,size) : 0;
