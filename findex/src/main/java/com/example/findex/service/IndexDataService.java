@@ -2,6 +2,8 @@ package com.example.findex.service;
 
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.response.ChartDataPoint;
+import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
@@ -13,6 +15,7 @@ import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -166,5 +169,50 @@ public class IndexDataService {
         .collect(Collectors.toList());
 
     return rankedList;
+  }
+
+  public IndexChartDto getIndexChart(String periodType, int indexInfoId, int limit) {
+    LocalDate beforeDate = calculateStartDate(periodType);
+    LocalDate today = LocalDate.now();
+
+    // 해당 indexInfoId의 지수 정보 가져오기
+    IndexInfo indexInfo = indexInfoRepository.findById((long) indexInfoId)
+        .orElseThrow(IndexInfoNotFoundException::new);
+
+    // 기간 내의 데이터 조회
+    List<IndexData> indexDataList = indexDataRepository
+        .findByIndexInfoAndBaseDateBetweenOrderByBaseDateAsc(indexInfo, beforeDate, today);
+
+    // 차트 데이터 변환
+    List<ChartDataPoint> dataPoints = indexDataList.stream()
+        .map(data -> new ChartDataPoint(data.getBaseDate(), data.getClosingPrice().doubleValue()))
+        .toList();
+
+    // 이동 평균 데이터 계산
+    List<ChartDataPoint> ma5DataPoints = calculateMovingAverage(dataPoints, 5);
+    List<ChartDataPoint> ma20DataPoints = calculateMovingAverage(dataPoints, 20);
+
+    return new IndexChartDto(
+        indexInfoId,
+        indexInfo.getIndexClassification(),
+        indexInfo.getIndexName(),
+        periodType,
+        dataPoints,
+        ma5DataPoints,
+        ma20DataPoints
+    );
+  }
+
+  private List<ChartDataPoint> calculateMovingAverage(List<ChartDataPoint> dataPoints, int period) {
+    List<ChartDataPoint> maDataPoints = new ArrayList<>();
+    for (int i = period - 1; i < dataPoints.size(); i++) {
+      double sum = 0;
+      for (int j = i - period + 1; j <= i; j++) {
+        sum += dataPoints.get(j).value();
+      }
+      double avg = sum / period;
+      maDataPoints.add(new ChartDataPoint(dataPoints.get(i).date(), avg));
+    }
+    return maDataPoints;
   }
 }
