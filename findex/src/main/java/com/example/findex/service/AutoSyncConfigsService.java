@@ -43,6 +43,8 @@ public class AutoSyncConfigsService {
   @Transactional(readOnly = true)
   public CursorPageResponseAutoSyncConfigDto findAutoSyncConfigsList(Long indexInfoId,
       Boolean enabled, Long idAfter, Long cursor, String sortField, String sortDirection, int size) {
+    // 추후 indexInfoId에 대한 검증 추가
+
     Pageable pageable = getPageable(sortField, sortDirection, size);
 
     Page<AutoSyncConfigs> page = autoSyncConfigsRepository.findAutoSyncConfigsList(
