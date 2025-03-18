@@ -1,6 +1,6 @@
 package com.example.findex.mapper;
 
-import com.example.findex.dto.IndexInfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.IndexInfoDto;
 import com.example.findex.entity.IndexInfo;
 import org.mapstruct.Mapper;
 
