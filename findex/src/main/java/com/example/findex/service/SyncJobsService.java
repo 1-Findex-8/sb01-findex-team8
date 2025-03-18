@@ -3,7 +3,6 @@ package com.example.findex.service;
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -27,10 +26,9 @@ public class SyncJobsService {
   public List<SyncJobsDto> syncIndexInfos() {
     GetStockMarketIndexResponse response = getStockMarketIndexResponse();
     // 실행 순서
-    // 1. 200 개씩 받아온다. -> totalCount 될 때까지
+    // 1. 200 개씩 받아온다.
       // 보통 1일당 156개
     // 2. index info로 가공해서 저장한다.
-      // auto sync가 활성화인지 아닌지 확인
     // 3. sync jobs도 함께 저장
     return null;
   }
@@ -43,8 +41,7 @@ public class SyncJobsService {
         + "&basDt=20250313";
     URI uri = URI.create(url);
 
-    GetStockMarketIndexResponse response = restTemplate.getForObject(uri, GetStockMarketIndexResponse.class);
-    return response;
+    return restTemplate.getForObject(uri, GetStockMarketIndexResponse.class);
   }
 
   private String getBaseDate() {
@@ -55,7 +52,6 @@ public class SyncJobsService {
 
     // 날짜를 "yyyyMMdd" 형식으로 변환합니다.
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-    String yesterdayStr = yesterday.format(formatter);
-    return yesterdayStr;
+    return yesterday.format(formatter);
   }
 }

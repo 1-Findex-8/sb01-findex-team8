@@ -1,7 +1,6 @@
 package com.example.findex.global.error.exception;
 
 import com.example.findex.global.error.ErrorResponse;
-import com.example.findex.global.error.exception.BusinessException;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ public class GlobalExceptionHandler {
         LocalDateTime.now(),
         exception.getErrorCode().getStatus(),
         exception.getErrorCode().getMessage(),
-        exception.getErrorCode().getDetails()
+        exception.getDetails()
     );
     return ResponseEntity.status(HttpStatusCode.valueOf(exception.getErrorCode().getStatus()))
         .body(errorResponse);
