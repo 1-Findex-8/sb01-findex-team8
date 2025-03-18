@@ -76,8 +76,8 @@ public class IndexData extends BaseEntity {
     this.lowPrice = lowPrice;
   }
 
-  public void updateVariation(BigDecimal variation) {
-    this.variation = variation;
+  public void updateVariation(BigDecimal versus) {
+    this.versus = versus;
   }
 
   public void updateFluctuationRate(BigDecimal fluctuationRate) {
