@@ -93,10 +93,10 @@ public interface IndexDataApi {
       )
   })
   ResponseEntity<CursorPageResponseIndexDataDto> getIndexDataList(
-      @Parameter(description = "지수 정보 ID") long indexInfoId,
+      @Parameter(description = "지수 정보 ID") Long indexInfoId,
       @Parameter(description = "시작 일자") LocalDate startDate,
       @Parameter(description = "종료 일자") LocalDate endDate,
-      @Parameter(description = "이전 페이지 마지막 요소 ID") long idAfter,
+      @Parameter(description = "이전 페이지 마지막 요소 ID") Long idAfter,
       @Parameter(description = "커서 (다음 페이지 시작점)") String cursor,
       @Parameter(description = "정렬 필드 (baseDate, marketPrice, closingPrice, highPrice, lowPrice, versus, fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount)") String sortField,
       @Parameter(description = "정렬 방향 (asc, desc)") String sortDirection,

@@ -10,13 +10,9 @@ import com.example.findex.service.IndexDataService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -63,10 +58,10 @@ public class IndexDataController implements IndexDataApi {
   @GetMapping
   @Override
   public ResponseEntity<CursorPageResponseIndexDataDto> getIndexDataList(
-      @RequestParam(value = "indexInfoId",required = false) long indexInfoId,
+      @RequestParam(value = "indexInfoId",required = false) Long indexInfoId,
       @RequestParam(value = "startDate",required = false) LocalDate startDate,
       @RequestParam(value = "endDate",required = false) LocalDate endDate,
-      @RequestParam(value = "idAfter",required = false) long idAfter,
+      @RequestParam(value = "idAfter",required = false) Long idAfter,
       @RequestParam(value = "cursor",required = false) String cursor,
       @RequestParam(value = "sortField",required = false, defaultValue = "baseDate") String sortField,
       @RequestParam(value = "sortDirection",required = false, defaultValue = "desc") String sortDirection,

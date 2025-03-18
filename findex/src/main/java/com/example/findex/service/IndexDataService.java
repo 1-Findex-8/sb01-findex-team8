@@ -45,7 +45,7 @@ public class IndexDataService {
     }
     IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
         .orElseThrow(() -> new NoSuchElementException(
-            "IndexInfo with id " + request.indexInfoId() + "not found"));
+            "IndexInfo with id " + request.indexInfoId() + " not found"));
 
     //사용자가 생성
     IndexData indexData = new IndexData(
@@ -67,44 +67,59 @@ public class IndexDataService {
   }
 
   //지수 데이터 조회(커서 페이징네이션)
-  public CursorPageResponseIndexDataDto findIndexDataList(long indexInfoId, LocalDate startDate,
-      LocalDate endDate, long idAfter, String cursor, String sortField,
+  public CursorPageResponseIndexDataDto findIndexDataList(Long indexInfoId, LocalDate startDate,
+      LocalDate endDate, Long idAfter, String cursor, String sortField,
       String sortDirection, int size) {
-    // 커서 기반 페이지네이션과 정렬 로직 처리
-    Pageable pageable = PageRequest.of(0, size,
-        sortDirection.equals("asc") ? Sort.by(sortField).ascending()
-            : Sort.by(sortField).descending());
 
-    // 데이터 조회
-    Page<IndexData> indexDataPage = indexDataRepository.findIndexDataList(
-        indexInfoId, startDate, endDate, idAfter, pageable
-    );
+    //커서값이 있으면 페이지 번호 계산
+    int page = (cursor != null && !cursor.isEmpty()) ? getPageFromCursor(cursor,size) : 0;
+    //Pageable 객체 생성
+    Pageable pageable = PageRequest.of(page,size,Sort.by(getSortDirection(sortDirection),sortField));
 
-    // DTO 변환
-    List<IndexDataDto> content = indexDataPage.getContent().stream()
+    //데이터 조회
+    List<IndexData> indexDataList = indexDataRepository.findIndexData(indexInfoId,startDate,endDate,idAfter,pageable);
+
+    //DTO 변환
+    List<IndexDataDto> content = indexDataList.stream()
         .map(indexDataMapper::toDto)
-        .collect(Collectors.toList());
+        .toList();
 
-    // 커서 계산
-    String nextCursor = null;
-    if (indexDataPage.hasNext()) {
-      nextCursor = generateNextCursor(
-          indexDataPage.getContent().get(indexDataPage.getContent().size() - 1).getId());
-    }
 
-    return new CursorPageResponseIndexDataDto(
-        content,
-        nextCursor,
-        indexDataPage.getContent().isEmpty() ? null
-            : indexDataPage.getContent().get(indexDataPage.getContent().size() - 1).getId(),
-        size,
-        indexDataPage.getTotalElements(),
-        indexDataPage.hasNext()
-    );
+    //마지막 요소의 ID 저장
+    Long nextIdAfter = content.isEmpty() ? null : content.get(content.size() - 1).id();
+    //nextCursor 생성
+    String nextCursor = nextIdAfter != null ? encodeCursor(nextIdAfter) : null;
+    //현재 페이지 사이즈가 size와 같으면 다음 페이지 존재
+    boolean hasNext = content.size() == size && nextIdAfter != null;
+
+    return new CursorPageResponseIndexDataDto(content,nextCursor,nextIdAfter,size,(long)content.size(),hasNext);
+  }
+  //페이지 번호 계산 메서드
+  private int getPageFromCursor(String cursor, int size) {
+    Long idAfter = decodeCursor(cursor);
+    // idAfter가 null일 경우 첫 페이지로 설정
+    return idAfter != null ? (int) (idAfter / size) : 0;
   }
 
-  private String generateNextCursor(Long lastId) {
-    return Base64.getEncoder().encodeToString(lastId.toString().getBytes(StandardCharsets.UTF_8));
+
+  // 정렬 방향 메서드
+  private Sort.Direction getSortDirection(String direction) {
+    return "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+  }
+
+  //커서 디코딩
+  private Long decodeCursor(String cursor) {
+    // 커서를 디코딩하여 해당 ID를 반환하는 메소드
+    try {
+      return cursor != null ? Long.valueOf(new String(Base64.getDecoder().decode(cursor))) : null;
+    } catch (IllegalArgumentException e) {
+      return null; // 잘못된 커서 값 처리
+    }
+  }
+
+  // 커서 인코딩
+  private String encodeCursor(Long id) {
+    return Base64.getEncoder().encodeToString(String.format("{\"id\":%d}", id).getBytes());
   }
 
   @Transactional(readOnly = true)
