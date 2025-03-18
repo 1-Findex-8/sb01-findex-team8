@@ -39,6 +39,8 @@ public class AutoSyncConfigController {
   ) {
     autoSyncConfigsService.findAutoSyncConfigsList(
         indexInfoId, enabled, idAfter, cursor, sortField, sortDirection, size);
-    return null;
+    return ResponseEntity.ok()
+        .body(autoSyncConfigsService.findAutoSyncConfigsList(
+            indexInfoId, enabled, idAfter, cursor, sortField, sortDirection, size));
   }
 }

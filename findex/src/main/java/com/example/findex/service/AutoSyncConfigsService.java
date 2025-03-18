@@ -13,7 +13,6 @@ import com.example.findex.repository.autosyncconfigs.AutoSyncConfigsRepository;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +40,7 @@ public class AutoSyncConfigsService {
     return autoSyncConfigsMapper.toAutoSyncConfigsDto(autoSyncConfigs);
   }
 
+  @Transactional(readOnly = true)
   public CursorPageResponseAutoSyncConfigDto findAutoSyncConfigsList(Long indexInfoId,
       Boolean enabled, Long idAfter, Long cursor, String sortField, String sortDirection, int size) {
     Pageable pageable = getPageable(sortField, sortDirection, size);
@@ -48,13 +48,7 @@ public class AutoSyncConfigsService {
     Page<AutoSyncConfigs> page = autoSyncConfigsRepository.findAutoSyncConfigsList(
         indexInfoId, enabled, idAfter, pageable);
 
-    List<AutoSyncConfigs> autoSyncConfigsList = page.getContent();
-    autoSyncConfigsList.forEach(
-        autoSyncConfigs -> autoSyncConfigs.getIndexInfo().getIndexName()
-    );
-
-
-    return null;
+    return autoSyncConfigsMapper.toCursorPageResponseAutoSyncConfigDto(page);
   }
 
   private Pageable getPageable(String sortField, String sortDirection, int size) {
