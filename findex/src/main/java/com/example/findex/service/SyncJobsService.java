@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -62,17 +63,7 @@ public class SyncJobsService {
     List<Item> itemList = apiResponse.response().body().items().item();
     itemList.forEach(
         item -> {
-          IndexInfo indexInfo = indexInfoRepository.save(
-              new IndexInfo(
-                  item.idxCsf(),
-                  item.idxNm(),
-                  item.epyItmsCnt(),
-                  LocalDate.parse(item.basPntm(), DateTimeFormatter.ofPattern("yyyyMMdd")),
-                  BigDecimal.valueOf(item.basIdx()),
-                  SourceType.OPEN_API,
-                  false
-              )
-          );
+          IndexInfo indexInfo = getIndexInfo(item);
 
           // 3. sync jobs도 함께 저장
           boolean exist = indexInfoRepository.existsById(indexInfo.getId());
@@ -117,6 +108,35 @@ public class SyncJobsService {
     return syncJobsMapper.toSyncJobsDtoList(syncJobsList);
   }
 
+  private IndexInfo getIndexInfo(Item item) {
+    Optional<IndexInfo> indexInfoOptional =
+        indexInfoRepository.findByIndexClassificationAndIndexName(item.idxCsf(), item.idxNm());
+
+    if (indexInfoOptional.isPresent()) { // indexInfo 존재 시 수정
+      IndexInfo indexInfo = indexInfoOptional.get();
+
+      indexInfo.updateBaseIndex(BigDecimal.valueOf(item.basIdx()));
+      indexInfo.updateBasePointInTime(getLocalDate(item.basPntm()));
+      indexInfo.updateEmployeeItemsCount(item.epyItmsCnt());
+
+      return indexInfoRepository.save(indexInfo);
+    }
+
+    // 기존 indexInfo 가 없다면 새로 저장
+    return indexInfoRepository.save(
+        new IndexInfo(
+            item.idxCsf(),
+            item.idxNm(),
+            item.epyItmsCnt(),
+            getLocalDate(item.basPntm()),
+            BigDecimal.valueOf(item.basIdx()),
+            SourceType.OPEN_API,
+            false
+        )
+    );
+
+  }
+
   private List<SyncJobs> callApi(IndexInfo indexInfo, IndexDataSyncRequest request, String worker) {
     String indexName = indexInfo.getIndexName();
     LocalDate baseDateFrom = request.baseDateFrom();
@@ -126,7 +146,7 @@ public class SyncJobsService {
 
     int currentCount = 0;
     int pageNum = 1;
-    GetStockMarketIndexResponse response = null;
+    GetStockMarketIndexResponse response;
     do { // indexName에 대한 모든 정보를 받아올 때까지 계속 요청
       response = getStockMarketIndexResponse(indexName, baseDateFrom, baseDateTo, pageNum);
       items.addAll(response.response().body().items().item());
@@ -144,7 +164,7 @@ public class SyncJobsService {
     IndexData indexData = indexDataRepository.save(
         new IndexData(
             indexInfo,
-            LocalDate.parse(item.basDt(), DateTimeFormatter.ofPattern("yyyyMMdd")),
+            getLocalDate(item.basDt()),
             SourceType.OPEN_API,
             BigDecimal.valueOf(item.mkp()),
             BigDecimal.valueOf(item.clpr()),
@@ -208,6 +228,10 @@ public class SyncJobsService {
 
   private String formatLocalDate(LocalDate localDate) {
     return localDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+  }
+
+  private LocalDate getLocalDate(String date) {
+    return LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyyMMdd"));
   }
 
   private String getIp(HttpServletRequest request) {
