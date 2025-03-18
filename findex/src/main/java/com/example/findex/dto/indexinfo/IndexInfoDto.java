@@ -1,13 +1,16 @@
-package com.example.findex.dto.IndexInfo;
+package com.example.findex.dto.indexinfo;
 
+import com.example.findex.entity.SourceType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CreateIndexInfoRequest(
+public record IndexInfoDto(
+    Long id,
     String indexClassification,
     String indexName,
-    int employedItemsCount,
+    int employeeItemsCount,
     LocalDate basePointInTime,
     BigDecimal baseIndex,
+    SourceType sourceType,
     boolean favorite) {
 }

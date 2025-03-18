@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 public class BusinessException extends RuntimeException {
+
   private final ErrorCode errorCode;
   private String details = ""; // details는 필수적이지 않다고 생각해서 ""로 초기화
 
@@ -18,5 +19,4 @@ public class BusinessException extends RuntimeException {
     this.errorCode = errorCode;
     this.details = details;
   }
-
 }
