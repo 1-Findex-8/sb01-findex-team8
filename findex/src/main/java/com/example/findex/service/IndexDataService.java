@@ -2,11 +2,22 @@ package com.example.findex.service;
 
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.response.ChartDataPoint;
+import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
+import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
+import com.example.findex.global.error.exception.IndexInfo.IndexInfoNotFoundException;
+import com.example.findex.mapper.IndexDataMapper;
+import com.example.findex.repository.IndexDataRepository;
+import com.example.findex.repository.IndexInfoRepository;
+import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import com.example.findex.global.error.ErrorCode;
 import com.example.findex.global.error.exception.BusinessException;
 import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
@@ -24,6 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -197,5 +209,90 @@ public class IndexDataService {
       ));
     }
     return Optional.empty();
+  }
+
+  public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, int indexInfoId, int limit) {
+
+    LocalDate beforeDate = calculateStartDate(periodType);
+    LocalDate today = LocalDate.now();
+
+    IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
+        .orElseThrow(IndexInfoNotFoundException::new);
+
+    List<IndexInfo> indexInfoList = indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
+
+    // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
+    List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
+
+    // 날짜별로 데이터를 매핑
+    Map<Long, IndexData> beforeDataMap = indexDataList.stream()
+        .filter(data -> data.getBaseDate().equals(beforeDate))
+        .collect(Collectors.toMap(data -> data.getIndexInfo().getId(), Function.identity()));
+
+    Map<Long, IndexData> currentDataMap = indexDataList.stream()
+        .filter(data -> data.getBaseDate().equals(today))
+        .collect(Collectors.toMap(data -> data.getIndexInfo().getId(), Function.identity()));
+
+    // IndexPerformanceDto 생성 및 정렬
+    List<IndexPerformanceDto> performanceList = indexInfoList.stream()
+        .map(indexInfo -> createIndexPerformanceDto(indexInfo, beforeDataMap, currentDataMap))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .sorted(Comparator.comparingDouble(IndexPerformanceDto::fluctuationRate).reversed()) // 등락률 기준 정렬
+        .limit(limit)
+        .toList();
+
+    // rank 추가 후 RankedIndexPerformanceDto로 변환
+    List<RankedIndexPerformanceDto> rankedList = IntStream.range(0, performanceList.size())
+        .mapToObj(i -> new RankedIndexPerformanceDto(performanceList.get(i), i + 1))
+        .limit(limit)
+        .collect(Collectors.toList());
+
+    return rankedList;
+  }
+
+  public IndexChartDto getIndexChart(String periodType, int indexInfoId) {
+    LocalDate beforeDate = calculateStartDate(periodType);
+    LocalDate today = LocalDate.now();
+
+    // 해당 indexInfoId의 지수 정보 가져오기
+    IndexInfo indexInfo = indexInfoRepository.findById((long) indexInfoId)
+        .orElseThrow(IndexInfoNotFoundException::new);
+
+    // 기간 내의 데이터 조회
+    List<IndexData> indexDataList = indexDataRepository
+        .findByIndexInfoAndBaseDateBetweenOrderByBaseDateAsc(indexInfo, beforeDate, today);
+
+    // 차트 데이터 변환
+    List<ChartDataPoint> dataPoints = indexDataList.stream()
+        .map(data -> new ChartDataPoint(data.getBaseDate(), data.getClosingPrice().doubleValue()))
+        .toList();
+
+    // 이동 평균 데이터 계산
+    List<ChartDataPoint> ma5DataPoints = calculateMovingAverage(dataPoints, 5);
+    List<ChartDataPoint> ma20DataPoints = calculateMovingAverage(dataPoints, 20);
+
+    return new IndexChartDto(
+        indexInfoId,
+        indexInfo.getIndexClassification(),
+        indexInfo.getIndexName(),
+        periodType,
+        dataPoints,
+        ma5DataPoints,
+        ma20DataPoints
+    );
+  }
+
+  private List<ChartDataPoint> calculateMovingAverage(List<ChartDataPoint> dataPoints, int period) {
+    List<ChartDataPoint> maDataPoints = new ArrayList<>();
+    for (int i = period - 1; i < dataPoints.size(); i++) {
+      double sum = 0;
+      for (int j = i - period + 1; j <= i; j++) {
+        sum += dataPoints.get(j).value();
+      }
+      double avg = sum / period;
+      maDataPoints.add(new ChartDataPoint(dataPoints.get(i).date(), avg));
+    }
+    return maDataPoints;
   }
 }

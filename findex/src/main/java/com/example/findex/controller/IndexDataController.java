@@ -3,6 +3,8 @@ package com.example.findex.controller;
 import com.example.findex.api.IndexDataApi;
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.response.IndexChartDto;
+import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.global.error.ErrorCode;
@@ -19,6 +21,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +40,24 @@ public class IndexDataController implements IndexDataApi {
       @RequestParam String periodType
   ){
     List<IndexPerformanceDto> dto = indexDataService.getInterestIndexPerformance(periodType);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  }
+
+  @GetMapping("/performance/rank")
+  public ResponseEntity<List<RankedIndexPerformanceDto>> getIndexPerformanceRank(
+      @RequestParam String periodType,
+      @RequestParam int indexInfoId,
+      @RequestParam int limit) {
+    List<RankedIndexPerformanceDto> dto = indexDataService.getIndexPerformanceRank(periodType, indexInfoId, limit);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  }
+
+  @GetMapping("/{indexInfoId}/chart")
+  public ResponseEntity<IndexChartDto> getIndexChart(
+      @PathVariable int indexInfoId,
+      @RequestParam String periodType
+  ) {
+    IndexChartDto dto = indexDataService.getIndexChart(periodType, indexInfoId);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 

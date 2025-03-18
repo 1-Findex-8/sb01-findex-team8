@@ -18,4 +18,7 @@ public interface IndexDataRepository extends JpaRepository<IndexData,Long> , Ind
 
   boolean existsByIndexInfoIdAndBaseDate(Long indexInfoId, LocalDate localDate);
 
+  List<IndexData> findByIndexInfoInAndBaseDateIn(List<IndexInfo> indexInfoList, List<LocalDate> beforeDate);
+
+  List<IndexData> findByIndexInfoAndBaseDateBetweenOrderByBaseDateAsc(IndexInfo indexInfo, LocalDate beforeDate, LocalDate today);
 }
