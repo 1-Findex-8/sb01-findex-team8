@@ -3,6 +3,7 @@ package com.example.findex.controller;
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
 import com.example.findex.service.SyncJobsService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,8 @@ public class SyncJobsController {
   }
 
   @PostMapping("/index-infos")
-  public ResponseEntity<SyncJobsDto> syncIndexInfos() {
-    return null;
+  public ResponseEntity<List<SyncJobsDto>> syncIndexInfos() {
+    return ResponseEntity.ok()
+        .body(syncJobsService.syncIndexInfos());
   }
 }

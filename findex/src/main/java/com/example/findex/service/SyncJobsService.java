@@ -1,10 +1,22 @@
 package com.example.findex.service;
 
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
+import com.example.findex.dto.syncjobs.response.Item;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
+import com.example.findex.entity.IndexInfo;
+import com.example.findex.entity.JobType;
+import com.example.findex.entity.Result;
+import com.example.findex.entity.SourceType;
+import com.example.findex.entity.SyncJobs;
+import com.example.findex.mapper.SyncJobsMapper;
+import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.SyncJobRepository;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,17 +32,54 @@ public class SyncJobsService {
 
   @Value("${open-api.encoding-service-key}")
   private String encodingServiceKey;
-
   private final RestTemplate restTemplate;
 
+  private final SyncJobRepository syncJobRepository;
+  private final IndexInfoRepository indexInfoRepository;
+
+  private final SyncJobsMapper syncJobsMapper;
+
   public List<SyncJobsDto> syncIndexInfos() {
-    GetStockMarketIndexResponse response = getStockMarketIndexResponse();
     // 실행 순서
     // 1. 200 개씩 받아온다.
       // 보통 1일당 156개
+    GetStockMarketIndexResponse apiResponse = getStockMarketIndexResponse();
+
     // 2. index info로 가공해서 저장한다.
-    // 3. sync jobs도 함께 저장
-    return null;
+    List<SyncJobs> syncJobsList = new ArrayList<>();
+
+    List<Item> itemList = apiResponse.response().body().items().item();
+    itemList.forEach(
+        item -> {
+          IndexInfo indexInfo = indexInfoRepository.save(
+              new IndexInfo(
+                  item.idxCsf(),
+                  item.idxNm(),
+                  item.epyItmsCnt(),
+                  LocalDate.parse(item.basPntm(), DateTimeFormatter.ofPattern("yyyyMMdd")),
+                  BigDecimal.valueOf(item.basIdx()),
+                  SourceType.OPEN_API,
+                  false
+              )
+          );
+
+          // 3. sync jobs도 함께 저장
+          boolean exist = indexInfoRepository.existsById(indexInfo.getId());
+
+          SyncJobs syncJobs = syncJobRepository.save(
+              new SyncJobs(
+                  JobType.INDEX_INFO,
+                  null,
+                  "system",
+                  LocalDateTime.now(),
+                  exist ? Result.SUCCESS : Result.FAILED,
+                  indexInfo
+              )
+          );
+          syncJobsList.add(syncJobs);
+        }
+    );
+    return syncJobsMapper.toSyncJobsDtoList(syncJobsList);
   }
 
   public GetStockMarketIndexResponse getStockMarketIndexResponse(){
@@ -38,7 +87,7 @@ public class SyncJobsService {
         + "?serviceKey=" + encodingServiceKey
         + "&resultType=json"
         + "&numOfRows=200"
-        + "&basDt=20250313";
+        + "&basDt=" + getBaseDate();
     URI uri = URI.create(url);
 
     return restTemplate.getForObject(uri, GetStockMarketIndexResponse.class);
