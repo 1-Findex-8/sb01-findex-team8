@@ -171,7 +171,7 @@ public class IndexDataService {
     return rankedList;
   }
 
-  public IndexChartDto getIndexChart(String periodType, int indexInfoId, int limit) {
+  public IndexChartDto getIndexChart(String periodType, int indexInfoId) {
     LocalDate beforeDate = calculateStartDate(periodType);
     LocalDate today = LocalDate.now();
 

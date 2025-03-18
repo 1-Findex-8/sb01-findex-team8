@@ -49,9 +49,9 @@ public class IndexDataController implements IndexDataApi {
   @GetMapping("/{indexInfoId}/chart")
   public ResponseEntity<IndexChartDto> getIndexChart(
       @PathVariable int indexInfoId,
-      @RequestParam String periodType,
-      @RequestParam int limit) {
-    IndexChartDto dto = indexDataService.getIndexChart(periodType, indexInfoId, limit);
+      @RequestParam String periodType
+  ) {
+    IndexChartDto dto = indexDataService.getIndexChart(periodType, indexInfoId);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
