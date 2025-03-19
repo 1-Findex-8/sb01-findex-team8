@@ -11,7 +11,6 @@ import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.ErrorCode;
 import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
 import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
@@ -19,7 +18,6 @@ import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundExce
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
