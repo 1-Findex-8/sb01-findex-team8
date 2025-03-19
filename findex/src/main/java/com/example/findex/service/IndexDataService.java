@@ -17,6 +17,7 @@ import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElemen
 import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
+import com.example.findex.repository.IndexDataRepositoryCustom;
 import com.example.findex.repository.IndexInfoRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -167,40 +168,6 @@ public class IndexDataService {
         .collect(Collectors.toList());
   }
 
-  private LocalDate calculateStartDate(String periodType) {
-    LocalDate today = LocalDate.now();
-    return switch (periodType) {
-      case "DAILY" -> today;
-      case "WEEKLY" -> today.minusWeeks(1);
-      case "MONTHLY" -> today.minusMonths(1);
-      default -> throw new IllegalStateException("Unexpected value: " + periodType);
-    };
-  }
-
-  private Optional<IndexPerformanceDto> createIndexPerformanceDto(IndexInfo
-      indexInfo, Map<Long, IndexData> beforeDataMap, Map<Long, IndexData> currentDataMap) {
-    IndexData beforeData = beforeDataMap.get(indexInfo.getId());
-    IndexData currentData = currentDataMap.get(indexInfo.getId());
-
-    if (beforeData != null && currentData != null) {
-      double beforePrice = beforeData.getClosingPrice().doubleValue();
-      double currentPrice = currentData.getClosingPrice().doubleValue();
-      double versus = currentPrice - beforePrice;
-      double fluctuationRate = (versus / beforePrice) * 100.0;
-
-      return Optional.of(new IndexPerformanceDto(
-          indexInfo.getId().intValue(),
-          indexInfo.getIndexClassification(),
-          indexInfo.getIndexName(),
-          versus,
-          fluctuationRate,
-          currentPrice,
-          beforePrice
-      ));
-    }
-    return Optional.empty();
-  }
-
   public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, int indexInfoId, int limit) {
 
     LocalDate beforeDate = calculateStartDate(periodType);
@@ -210,7 +177,7 @@ public class IndexDataService {
         .orElseThrow(IndexInfoNotFoundException::new);
 
     List<IndexInfo> indexInfoList =
-        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification()); // 수정 필요
+        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
 
     // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
     List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
@@ -272,6 +239,48 @@ public class IndexDataService {
         ma5DataPoints,
         ma20DataPoints
     );
+  }
+
+  public List<IndexData> findByFilters(
+      Long indexInfoId, LocalDate startDate, LocalDate endDate,
+      String sortField, String sortDirection
+  ) {
+    return indexDataRepository.findByFilters(
+        indexInfoId, startDate, endDate, sortField, sortDirection);
+  }
+
+  private LocalDate calculateStartDate(String periodType) {
+    LocalDate today = LocalDate.now();
+    return switch (periodType) {
+      case "DAILY" -> today;
+      case "WEEKLY" -> today.minusWeeks(1);
+      case "MONTHLY" -> today.minusMonths(1);
+      default -> throw new IllegalStateException("Unexpected value: " + periodType);
+    };
+  }
+
+  private Optional<IndexPerformanceDto> createIndexPerformanceDto(IndexInfo
+                                                                      indexInfo, Map<Long, IndexData> beforeDataMap, Map<Long, IndexData> currentDataMap) {
+    IndexData beforeData = beforeDataMap.get(indexInfo.getId());
+    IndexData currentData = currentDataMap.get(indexInfo.getId());
+
+    if (beforeData != null && currentData != null) {
+      double beforePrice = beforeData.getClosingPrice().doubleValue();
+      double currentPrice = currentData.getClosingPrice().doubleValue();
+      double versus = currentPrice - beforePrice;
+      double fluctuationRate = (versus / beforePrice) * 100.0;
+
+      return Optional.of(new IndexPerformanceDto(
+          indexInfo.getId().intValue(),
+          indexInfo.getIndexClassification(),
+          indexInfo.getIndexName(),
+          versus,
+          fluctuationRate,
+          currentPrice,
+          beforePrice
+      ));
+    }
+    return Optional.empty();
   }
 
   private List<ChartDataPoint> calculateMovingAverage(List<ChartDataPoint> dataPoints, int period) {
