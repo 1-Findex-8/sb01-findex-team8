@@ -1,6 +1,7 @@
 package com.example.findex.service;
 
 import com.example.findex.dto.syncjobs.request.IndexDataSyncRequest;
+import com.example.findex.dto.syncjobs.response.CursorPageResponseSyncJobDto;
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
 import com.example.findex.dto.syncjobs.response.Item;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
@@ -13,7 +14,7 @@ import com.example.findex.entity.SyncJobs;
 import com.example.findex.mapper.SyncJobsMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
-import com.example.findex.repository.SyncJobRepository;
+import com.example.findex.repository.syncjob.SyncJobRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -29,6 +30,10 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -106,6 +111,24 @@ public class SyncJobsService {
     );
 
     return syncJobsMapper.toSyncJobsDtoList(syncJobsList);
+  }
+
+  @Transactional(readOnly = true)
+  public CursorPageResponseSyncJobDto findSyncJobList(JobType jobType, Long indexInfoId, LocalDate baseDateFrom,
+      LocalDate baseDateTo, String worker, LocalDateTime jobTimeFrom, LocalDateTime jobTimeTo,
+      Result status, Long idAfter, Long cursor, String sortField, String sortDirection, int size) {
+    // 추후 indexInfoId에 대한 검증 추가
+    Pageable pageable = getPageable(sortField, sortDirection, size);
+
+    Page<SyncJobs> page = syncJobRepository.findSyncJobsList(jobType, indexInfoId,
+        baseDateFrom, baseDateTo, worker, jobTimeFrom, jobTimeTo, status, idAfter, cursor, pageable);
+
+    return syncJobsMapper.toCursorPageResponseSyncJobDto(page);
+  }
+
+  private Pageable getPageable(String sortField, String sortDirection, int size) {
+    Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+    return PageRequest.of(0, size, sort);
   }
 
   private IndexInfo getIndexInfo(Item item) {
