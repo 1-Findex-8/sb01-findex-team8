@@ -1,4 +1,4 @@
-package com.example.findex.global.error.exception.IndexInfo;
+package com.example.findex.global.error.exception.indexinfo;
 
 import com.example.findex.global.error.ErrorCode;
 import com.example.findex.global.error.exception.BusinessException;
