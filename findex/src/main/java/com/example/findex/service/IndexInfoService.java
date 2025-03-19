@@ -161,7 +161,24 @@ public class IndexInfoService {
         .stream()
         .map(indexInfoMapper::toSummaryDto)
         .toList();
-
   }
 
+  private Sort.Order getSortOrder(String sortField, SortDirectionType sortDirection) {
+    switch (sortField) {
+      case "indexClassification":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexClassification")
+            : Sort.Order.desc("indexClassification");
+      case "indexName":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexName")
+            : Sort.Order.desc("indexName");
+      case "employedItemsCount":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("employedItemsCount")
+            : Sort.Order.desc("employedItemsCount");
+      default:
+        throw new IndexInfoInvalidSortField(ErrorCode.INDEX_INFO_INVALID_SORT_FIELD.getMessage());
+    }
+  }
 }
