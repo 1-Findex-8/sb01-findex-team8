@@ -48,10 +48,10 @@ public class IndexDataService {
     //중복 체크
     if (indexDataRepository.existsByIndexInfoIdAndBaseDate(request.indexInfoId(),
         request.baseDate())) {
-      throw new IndexDataInternalServerErrorException(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION.getMessage());
+      throw new IndexDataInternalServerErrorException(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION.getMessage());
     }
     IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
-        .orElseThrow(() -> new IndexDataNoSuchElementException(ErrorCode.INDEX_NOT_FOUND.getMessage()));
+        .orElseThrow(() -> new IndexDataNoSuchElementException(ErrorCode.INDEXDATA_NOT_FOUND.getMessage()));
 
     //사용자가 생성
     IndexData indexData = new IndexData(
@@ -79,7 +79,7 @@ public class IndexDataService {
 
     //정렬필드가 sourceType이면 예외 발생
     if("sourceType".equalsIgnoreCase(sortField)) {
-      throw new IndexDataBadRequestException(ErrorCode.INDEX_BAD_REQUEST.getMessage());
+      throw new IndexDataBadRequestException(ErrorCode.INDEXDATA_BAD_REQUEST.getMessage());
     }
 
     //커서값이 있으면 페이지 번호 계산
