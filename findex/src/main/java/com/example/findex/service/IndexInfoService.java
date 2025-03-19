@@ -13,6 +13,10 @@ import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicate;
 import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidCursor;
 import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidSortField;
 import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFound;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicateException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidCursor;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidSortField;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexInfoMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
@@ -170,4 +174,22 @@ public class IndexInfoService {
     indexDataRepository.deleteByIndexInfo(indexInfo);
   }
 
+  private Sort.Order getSortOrder(String sortField, SortDirectionType sortDirection) {
+    switch (sortField) {
+      case "indexClassification":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexClassification")
+            : Sort.Order.desc("indexClassification");
+      case "indexName":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexName")
+            : Sort.Order.desc("indexName");
+      case "employedItemsCount":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("employedItemsCount")
+            : Sort.Order.desc("employedItemsCount");
+      default:
+        throw new IndexInfoInvalidSortField(ErrorCode.INDEX_INFO_INVALID_SORT_FIELD.getMessage());
+    }
+  }
 }

@@ -8,7 +8,6 @@ import com.example.findex.dto.indexinfo.SortDirectionType;
 import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.SourceType;
 import com.example.findex.service.IndexInfoService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

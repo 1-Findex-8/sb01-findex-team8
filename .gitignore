@@ -177,3 +177,7 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/macos,intellij,java
 
 findex/build
+.idea
+.idea/$
+.idea/misc.xml
+.idea/modules.xml

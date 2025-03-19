@@ -38,7 +38,9 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
       "CASE WHEN :sortField = 'indexClassification' THEN i.indexClassification END ASC, " +
       "CASE WHEN :sortField = 'indexName' THEN i.indexName END ASC, " +
       "CASE WHEN :sortField = 'employedItemsCount' THEN i.employeeItemsCount END ASC")
-  Page<IndexInfoDto> findByFilters(@Param("indexClassification") String indexClassification,
+
+  Page<IndexInfoDto> findByFilters(
+      @Param("indexClassification") String indexClassification,
       @Param("indexName") String indexName,
       @Param("favorite") boolean favorite,
       @Param("idAfter") Long idAfter,
