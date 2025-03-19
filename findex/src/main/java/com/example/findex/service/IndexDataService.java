@@ -14,7 +14,7 @@ import com.example.findex.global.error.ErrorCode;
 import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
 import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFound;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
@@ -182,7 +182,7 @@ public class IndexDataService {
     LocalDate today = LocalDate.now();
 
     IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
-        .orElseThrow(IndexInfoNotFound::new);
+        .orElseThrow(IndexInfoNotFoundException::new);
 
     List<IndexInfo> indexInfoList =
         indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
@@ -221,7 +221,7 @@ public class IndexDataService {
 
     // 해당 indexInfoId의 지수 정보 가져오기
     IndexInfo indexInfo = indexInfoRepository.findById((long) indexInfoId)
-        .orElseThrow(IndexInfoNotFound::new);
+        .orElseThrow(IndexInfoNotFoundException::new);
 
     // 기간 내의 데이터 조회
     List<IndexData> indexDataList = indexDataRepository
