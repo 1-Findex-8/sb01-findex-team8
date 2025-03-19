@@ -17,7 +17,6 @@ import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElemen
 import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
-import com.example.findex.repository.IndexDataRepositoryCustom;
 import com.example.findex.repository.IndexInfoRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -200,13 +199,11 @@ public class IndexDataService {
         .limit(limit)
         .toList();
 
-    // rank 추가 후 RankedIndexPerformanceDto로 변환
-    List<RankedIndexPerformanceDto> rankedList = IntStream.range(0, performanceList.size())
-        .mapToObj(i -> new RankedIndexPerformanceDto(performanceList.get(i), i + 1))
-        .limit(limit)
-        .collect(Collectors.toList());
 
-    return rankedList;
+      return IntStream.range(0, performanceList.size())
+          .mapToObj(i -> new RankedIndexPerformanceDto(performanceList.get(i), i + 1))
+          .limit(limit)
+          .collect(Collectors.toList());
   }
 
   public IndexChartDto getIndexChart(String periodType, int indexInfoId) {
