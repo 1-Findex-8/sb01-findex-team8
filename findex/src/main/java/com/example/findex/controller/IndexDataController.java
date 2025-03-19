@@ -8,10 +8,16 @@ import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
+import com.example.findex.service.IndexInfoService;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexDataController implements IndexDataApi {
 
   private final IndexDataService indexDataService;
+  private final IndexInfoService indexInfoService;
 
+  @Override
   @GetMapping("/performance/favorite")
   public ResponseEntity<List<IndexPerformanceDto>> getIndexFavoritePerformanceRank(
       @RequestParam String periodType
@@ -36,6 +44,7 @@ public class IndexDataController implements IndexDataApi {
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
+  @Override
   @GetMapping("/performance/rank")
   public ResponseEntity<List<RankedIndexPerformanceDto>> getIndexPerformanceRank(
       @RequestParam String periodType,
@@ -45,6 +54,7 @@ public class IndexDataController implements IndexDataApi {
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
+  @Override
   @GetMapping("/{indexInfoId}/chart")
   public ResponseEntity<IndexChartDto> getIndexChart(
       @PathVariable int indexInfoId,
@@ -77,5 +87,30 @@ public class IndexDataController implements IndexDataApi {
         indexInfoId,startDate,endDate,idAfter,cursor,sortField,sortDirection,size
     );
     return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  @Override
+  @GetMapping("/export/csv")
+  public ResponseEntity<InputStreamResource> getIndexDataCsv(
+      @RequestParam(value = "indexInfoId",required = false) Long indexInfoId,
+      @RequestParam(value = "startDate",required = false) LocalDate startDate,
+      @RequestParam(value = "endDate",required = false) LocalDate endDate,
+      @RequestParam(value = "sortField",required = false, defaultValue = "baseDate") String sortField,
+      @RequestParam(value = "sortDirection",required = false, defaultValue = "desc") String sortDirection
+  ) {
+
+    String csvData = indexDataService.findToCsv(indexInfoId, startDate, endDate, sortField, sortDirection);
+
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(csvData.getBytes(StandardCharsets.UTF_8));
+    InputStreamResource resource = new InputStreamResource(inputStream);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=index_data.csv");
+    headers.add(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8");
+
+    return ResponseEntity.ok()
+        .headers(headers)
+        .contentType(MediaType.parseMediaType("text/csv"))
+        .body(resource);
   }
 }

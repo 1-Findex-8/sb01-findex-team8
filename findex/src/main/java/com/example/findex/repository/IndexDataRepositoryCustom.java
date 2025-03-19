@@ -9,4 +9,8 @@ public interface IndexDataRepositoryCustom {
   List<IndexData> findIndexData(Long indexInfoId, LocalDate startDate, LocalDate endDate,Long idAfter,
       Pageable pageable);
 
+  List<IndexData> findByFilters(
+      Long indexInfoId, LocalDate startDate, LocalDate endDate, String sortField,
+      String sortDirection
+  );
 }
