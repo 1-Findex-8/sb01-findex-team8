@@ -3,10 +3,12 @@ package com.example.findex.controller;
 import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
 import com.example.findex.dto.indexinfo.CursorPageResponseIndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.IndexInfoSummaryDto;
 import com.example.findex.dto.indexinfo.SortDirectionType;
 import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.SourceType;
 import com.example.findex.service.IndexInfoService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,8 +68,15 @@ public class IndexInfoController {
       ) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(indexInfoService.getIndexInfoList(
+        .body(indexInfoService.findList(
             indexClassification, indexName, favorite, idAfter, cursor, sortField, sortDirection, size
         ));
+  }
+
+  @GetMapping("/summaries")
+  public ResponseEntity<List<IndexInfoSummaryDto>> findIndexInfoSummaryList() {
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(indexInfoService.findSummaryList());
   }
 }

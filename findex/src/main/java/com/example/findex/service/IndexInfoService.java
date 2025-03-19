@@ -3,6 +3,7 @@ package com.example.findex.service;
 import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
 import com.example.findex.dto.indexinfo.CursorPageResponseIndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.IndexInfoSummaryDto;
 import com.example.findex.dto.indexinfo.SortDirectionType;
 import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
@@ -64,7 +65,7 @@ public class IndexInfoService {
             .orElseThrow(() -> new IndexInfoNotFoundException(ErrorCode.INDEX_INFO_NOT_FOUND.getMessage())));
   }
 
-  public CursorPageResponseIndexInfoDto getIndexInfoList(
+  public CursorPageResponseIndexInfoDto findList(
       String indexClassification,
       String indexName,
       boolean favorite,
@@ -154,4 +155,13 @@ public class IndexInfoService {
         throw new IndexInfoInvalidSortField(ErrorCode.INDEX_INFO_INVALID_SORT_FIELD.getMessage());
     }
   }
+
+  public List<IndexInfoSummaryDto> findSummaryList() {
+    return indexInfoRepository.findAll()
+        .stream()
+        .map(indexInfoMapper::toSummaryDto)
+        .toList();
+
+  }
+
 }
