@@ -102,5 +102,30 @@ public interface IndexDataApi {
       @Parameter(description = "페이지 크기") int size
   );
 
-  //
+  //DELETE /api/index-data/{id}
+  @Operation(
+      summary = "지수 데이터 삭제",
+      description = "지수 데이터를 삭제합니다."
+  )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "204",
+          description = "지수 데이터 삭제 성공"
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "삭제할 지수 데이터를 찾을 수 없음",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "500",
+          description = "서버 오류",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      )
+  })
+  ResponseEntity<Void> deleteIndexData(@Parameter(description = "지수 데이터 ID",required = true) Long indexInfoId);
 }

@@ -133,6 +133,15 @@ public class IndexDataService {
     return Base64.getEncoder().encodeToString(String.format("{\"id\":%d}", id).getBytes());
   }
 
+
+  public void delete(Long id) {
+    if(indexDataRepository.existsById(id)) {
+      throw new IndexDataNoSuchElementException();
+    }
+    indexDataRepository.deleteById(id);
+  }
+
+
   @Transactional(readOnly = true)
   public List<IndexPerformanceDto> getInterestIndexPerformance(String periodType) {
     // 관심 종목 조회 (favorite=true)
@@ -286,4 +295,6 @@ public class IndexDataService {
     }
     return maDataPoints;
   }
+
+
 }
