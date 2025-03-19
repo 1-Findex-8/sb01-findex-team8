@@ -6,10 +6,10 @@ import com.example.findex.global.error.exception.BusinessException;
 public class IndexDataIntegrityViolationException extends BusinessException {
 
   public IndexDataIntegrityViolationException(){
-    super(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION);
+    super(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION);
   }
 
   public IndexDataIntegrityViolationException(String details) {
-    super(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION, details);
+    super(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION, details);
   }
 }

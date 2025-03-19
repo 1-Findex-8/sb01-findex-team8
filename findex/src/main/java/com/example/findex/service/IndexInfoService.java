@@ -47,7 +47,7 @@ public class IndexInfoService {
 
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
     IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
-        .orElseThrow(() -> new BusinessException(ErrorCode.INDEXINFO_NOT_FOUND)); // 임시 수정
+        .orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND)); // 임시 수정
 
     indexInfo.setEmployeeItemsCount(request.employedItemsCount());
     indexInfo.setBasePointInTime(request.basePointInTime());
@@ -60,7 +60,7 @@ public class IndexInfoService {
   public IndexInfoDto findById(Long indexInfoId) {
     return indexInfoMapper.toDto(
         indexInfoRepository.findById(indexInfoId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.INDEXINFO_NOT_FOUND))); // 임시 수정
+            .orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND))); // 임시 수정
   }
 
   public List<IndexInfoDto> findAndSort(FindIndexInfoRequest request) {

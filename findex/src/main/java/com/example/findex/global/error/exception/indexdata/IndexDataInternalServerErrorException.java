@@ -5,10 +5,10 @@ import com.example.findex.global.error.exception.BusinessException;
 
 public class IndexDataInternalServerErrorException extends BusinessException {
   public IndexDataInternalServerErrorException(){
-    super(ErrorCode.INDEXDATA_INTERNAL_SERVER_ERROR);
+    super(ErrorCode.INDEX_DATA_INTERNAL_SERVER_ERROR);
   }
 
   public IndexDataInternalServerErrorException(String details) {
-    super(ErrorCode.INDEXDATA_INTERNAL_SERVER_ERROR,details);
+    super(ErrorCode.INDEX_DATA_INTERNAL_SERVER_ERROR,details);
   }
 }
