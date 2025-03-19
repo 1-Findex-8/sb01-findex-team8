@@ -11,11 +11,7 @@ public interface IndexInfoMapper {
 
   IndexInfoDto toDto(IndexInfo indexInfo);
 
-  @Mapping(target = "employeeItemsCount", ignore = true)
-  @Mapping(target = "employeeItemsCount", ignore = true)
-  @Mapping(target = "basePointInTime", ignore = true)
-  @Mapping(target = "baseIndex", ignore = true)
-  @Mapping(target = "sourceType", ignore = true)
-  @Mapping(target = "favorite", ignore = true)
+  @Mapping(target = "indexClassification", source = "indexClassification")
+  @Mapping(target = "indexName", source = "indexName")
   IndexInfoSummaryDto toSummaryDto(IndexInfo indexInfo);
 }
