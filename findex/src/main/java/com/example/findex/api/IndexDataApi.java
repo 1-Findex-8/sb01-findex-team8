@@ -75,7 +75,9 @@ public interface IndexDataApi {
           responseCode = "200",
           description = "지수 데이터 목록 조회 성공",
           content = @Content(
-              schema = @Schema(implementation = CursorPageResponseIndexDataDto.class)
+              schema = @Schema(
+                  implementation = CursorPageResponseIndexDataDto.class
+              )
           )
       ),
       @ApiResponse(
@@ -128,9 +130,7 @@ public interface IndexDataApi {
           responseCode = "404",
           description = "수정할 지수 데이터를 찾을 수 없음",
           content = @Content(
-              schema = @Schema(
-                  implementation = ErrorResponse.class
-              )
+              schema = @Schema(implementation = ErrorResponse.class)
           )
       ),
       @ApiResponse(
@@ -141,5 +141,6 @@ public interface IndexDataApi {
           )
       )
   })
-  ResponseEntity<IndexDataDto> updateIndexData(@Parameter(description = "지수 데이터 ID") Long id,@RequestBody IndexDataUpdateRequest indexDataUpdateRequest);
+  ResponseEntity<IndexDataDto> updateIndexData(
+      @Parameter(description = "지수 데이터 ID") Long id,@RequestBody IndexDataUpdateRequest indexDataUpdateRequest);
 }
