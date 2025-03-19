@@ -101,4 +101,43 @@ public interface IndexDataApi {
       @Parameter(description = "정렬 방향 (asc, desc)") String sortDirection,
       @Parameter(description = "페이지 크기") int size
   );
+
+  //PATCH /api/index-data/{id}
+  @Operation(
+      summary = "지수 데이터 수정",
+      description = "기존 지수 데이터를 수정합니다."
+  )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "지수 데이터 수정 성공",
+          content = @Content(
+              schema = @Schema(implementation = IndexDataDto.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청 (유효하지 않은 데이터 값 등)",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "수정할 지수 데이터를 찾을 수 없음",
+          content = @Content(
+              schema = @Schema(
+                  implementation = ErrorResponse.class
+              )
+          )
+      ),
+      @ApiResponse(
+          responseCode = "500",
+          description = "서버 오류",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      )
+  })
+  ResponseEntity<IndexDataUpdateRequest> updateIndexData(@Parameter(description = "지수 데이터 ID") Long id);
 }
