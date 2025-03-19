@@ -87,5 +87,11 @@ public class IndexData extends BaseEntity {
   public void updateTradingQuantity(Long tradingQuantity) {
     this.tradingQuantity = tradingQuantity;
   }
+  public void updateTradingPrice(Long tradingPrice){
+    this.tradingPrice = tradingPrice;
+  }
+  public void updateMarketTotalAmount(Long marketTotalAmount){
+    this.marketTotalAmount = marketTotalAmount;
+  }
 }
 

@@ -2,6 +2,7 @@ package com.example.findex.api;
 
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.request.IndexDataUpdateRequest;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "지수 데이터 API")
 public interface IndexDataApi {
@@ -139,5 +141,5 @@ public interface IndexDataApi {
           )
       )
   })
-  ResponseEntity<IndexDataUpdateRequest> updateIndexData(@Parameter(description = "지수 데이터 ID") Long id);
+  ResponseEntity<IndexDataDto> updateIndexData(@Parameter(description = "지수 데이터 ID") Long id,@RequestBody IndexDataUpdateRequest indexDataUpdateRequest);
 }

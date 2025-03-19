@@ -3,6 +3,7 @@ package com.example.findex.controller;
 import com.example.findex.api.IndexDataApi;
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.request.IndexDataUpdateRequest;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,8 +59,8 @@ public class IndexDataController implements IndexDataApi {
   @PostMapping
   @Override
   public ResponseEntity<?> createIndexData(@RequestBody IndexDataCreateRequest indexDataCreateRequest) {
-    IndexDataDto indexDto = indexDataService.create(indexDataCreateRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(indexDto);
+    IndexDataDto response = indexDataService.create(indexDataCreateRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @GetMapping
@@ -76,6 +78,14 @@ public class IndexDataController implements IndexDataApi {
     CursorPageResponseIndexDataDto response = indexDataService.findIndexDataList(
         indexInfoId,startDate,endDate,idAfter,cursor,sortField,sortDirection,size
     );
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  @PatchMapping("/{id}")
+  @Override
+  public ResponseEntity<IndexDataDto> updateIndexData(
+      @PathVariable Long id, @RequestBody IndexDataUpdateRequest indexDataUpdateRequest) {
+    IndexDataDto response = indexDataService.updateIndexData(id,indexDataUpdateRequest);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }

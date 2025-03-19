@@ -2,6 +2,7 @@ package com.example.findex.service;
 
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.request.IndexDataUpdateRequest;
 import com.example.findex.dto.indexdata.response.ChartDataPoint;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.IndexChartDto;
@@ -18,6 +19,7 @@ import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundExce
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -132,6 +134,45 @@ public class IndexDataService {
   private String encodeCursor(Long id) {
     return Base64.getEncoder().encodeToString(String.format("{\"id\":%d}", id).getBytes());
   }
+
+  //지수 데이터 업데이트
+  public IndexDataDto updateIndexData(Long id, IndexDataUpdateRequest request) {
+    IndexData updateIndexData = indexDataRepository.findById(id)
+        .orElseThrow(()->new IndexDataNoSuchElementException(ErrorCode.INDEXDATA_NOT_FOUND.getMessage()));
+
+    if(request.marketPrice() != null){
+      updateIndexData.updateMarketPrice(request.marketPrice());
+    }
+    if(request.closingPrice() != null){
+      updateIndexData.updateClosingPrice(request.closingPrice());
+    }
+    if(request.highPrice() != null){
+      updateIndexData.updateHighPrice(request.highPrice());
+    }
+    if(request.lowPrice() != null){
+      updateIndexData.updateLowPrice(request.lowPrice());
+    }
+    if(request.versus() != null){
+      updateIndexData.updateVariation(request.versus());
+    }
+    if(request.fluctuationRate() != null){
+      updateIndexData.updateFluctuationRate(request.fluctuationRate());
+    }
+    if(request.tradingQuantity() != null){
+      updateIndexData.updateTradingQuantity(request.tradingQuantity());
+    }
+    if(request.tradingPrice() != null){
+      updateIndexData.updateTradingPrice(request.tradingPrice());
+    }
+    if(request.marketTotalAmount() != null){
+      updateIndexData.updateMarketTotalAmount(request.marketTotalAmount());
+    }
+
+    IndexData updated = indexDataRepository.save(updateIndexData);
+
+    return indexDataMapper.toDto(updated);
+  }
+
 
   @Transactional(readOnly = true)
   public List<IndexPerformanceDto> getInterestIndexPerformance(String periodType) {
@@ -286,4 +327,6 @@ public class IndexDataService {
     }
     return maDataPoints;
   }
+
+
 }
