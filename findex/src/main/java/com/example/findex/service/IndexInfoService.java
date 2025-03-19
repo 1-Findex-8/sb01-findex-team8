@@ -3,6 +3,7 @@ package com.example.findex.service;
 import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
 import com.example.findex.dto.indexinfo.CursorPageResponseIndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.IndexInfoSummaryDto;
 import com.example.findex.dto.indexinfo.SortDirectionType;
 import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
@@ -64,7 +65,7 @@ public class IndexInfoService {
             .orElseThrow(() -> new IndexInfoNotFoundException(ErrorCode.INDEX_INFO_NOT_FOUND.getMessage())));
   }
 
-  public CursorPageResponseIndexInfoDto getIndexInfoList(
+  public CursorPageResponseIndexInfoDto findList(
       String indexClassification,
       String indexName,
       boolean favorite,
@@ -134,6 +135,32 @@ public class IndexInfoService {
         (long) resultList.size(), // totalElements
         hasNext
     );
+  }
+
+  private Sort.Order getSortOrder(String sortField, SortDirectionType sortDirection) {
+    switch (sortField) {
+      case "indexClassification":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexClassification")
+            : Sort.Order.desc("indexClassification");
+      case "indexName":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexName")
+            : Sort.Order.desc("indexName");
+      case "employedItemsCount":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("employedItemsCount")
+            : Sort.Order.desc("employedItemsCount");
+      default:
+        throw new IndexInfoInvalidSortField(ErrorCode.INDEX_INFO_INVALID_SORT_FIELD.getMessage());
+    }
+  }
+
+  public List<IndexInfoSummaryDto> findSummaryList() {
+    return indexInfoRepository.findAll()
+        .stream()
+        .map(indexInfoMapper::toSummaryDto)
+        .toList();
   }
 
   private Sort.Order getSortOrder(String sortField, SortDirectionType sortDirection) {
