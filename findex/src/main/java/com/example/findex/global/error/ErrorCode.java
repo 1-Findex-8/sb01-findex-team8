@@ -16,6 +16,7 @@ public enum ErrorCode {
   INDEX_INTERNAL_SERVER_ERROR(500,"서버 내부 오류가 발생했습니다."),
   
   // syncjobs
+  SYNCJOB_NOT_FOUND(404, "syncjob을 찾지 못했습니다."),
 
   // autosyncconfigs
   AUTOSYNCCONFIGS_NOT_FOUND(404, "auto sync config를 찾지 못했습니다");
