@@ -295,4 +295,29 @@ public class IndexDataService {
     }
     return maDataPoints;
   }
+
+  private String convertToCsv(List<IndexData> indexDataList) {
+    String header = "IndexInfoId, BaseDate, ClosingPrice, HighPrice, LowPrice, Variation, FluctuationRate, TradingQuantity, TradingPrice, MarketCapitalization";
+
+    String body = indexDataList.stream()
+            .map(data -> String.join(",",
+                    String.valueOf(data.getIndexInfo().getId()),
+                    data.getBaseDate().toString(),
+                    data.getClosingPrice().toPlainString(),
+                    data.getHighPrice().toPlainString(),
+                    data.getLowPrice().toPlainString(),
+                    data.getVersus().toPlainString(),
+                    data.getFluctuationRate().toPlainString(),
+                    String.valueOf(data.getTradingQuantity()),
+                    String.valueOf(data.getTradingPrice())
+            ))
+            .collect(Collectors.joining("\n"));
+
+    return header + "\n" + body;
+  }
+
+  public String findToCsv(Long indexInfoId, LocalDate startDate, LocalDate endDate, String sortField, String sortDirection) {
+    List<IndexData> indexDataList = findByFilters(indexInfoId, startDate, endDate, sortField, sortDirection);
+    return convertToCsv(indexDataList);
+  }
 }
