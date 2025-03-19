@@ -25,4 +25,8 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
 
   void deleteById(Long indexInfoId);
 
+  Optional<IndexInfo> findByIndexClassificationAndIndexName(String classification, String name);
+
+  List<IndexInfo> findByIndexClassification(String classification);  // 임시 추가, 수정 필요
+
 }

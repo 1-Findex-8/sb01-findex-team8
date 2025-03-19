@@ -9,10 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IndexDataRepository extends JpaRepository<IndexData,Long> {
-  List<IndexData> findByIndexInfoIdInAndBaseDateIn(List<Long> indexInfoIds, List<LocalDate> beforeDate);
+public interface IndexDataRepository extends JpaRepository<IndexData,Long> , IndexDataRepositoryCustom {
   
-  IndexData save(IndexData indexData);
+  List<IndexData> findByIndexInfoIdInAndBaseDateIn(List<Long> indexInfoIds, List<LocalDate> beforeDate);
 
   boolean existsByIndexInfoIdAndBaseDate(Long indexInfoId, LocalDate localDate);
+
+  Optional<IndexData> findByIndexInfoAndBaseDate(IndexInfo indexInfo, LocalDate baseDate);
+
+  List<IndexData> findByIndexInfoInAndBaseDateIn(List<IndexInfo> indexInfoList, List<LocalDate> beforeDate);
+
+  List<IndexData> findByIndexInfoAndBaseDateBetweenOrderByBaseDateAsc(IndexInfo indexInfo, LocalDate beforeDate, LocalDate today);
 }

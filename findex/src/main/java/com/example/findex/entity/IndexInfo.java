@@ -12,10 +12,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "index_info")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IndexInfo extends BaseEntity {
@@ -41,4 +43,16 @@ public class IndexInfo extends BaseEntity {
 
   @Column(nullable = false)
   private boolean favorite = false;
+
+  public void updateEmployeeItemsCount(int employeeItemsCount) {
+    this.employeeItemsCount = employeeItemsCount;
+  }
+
+  public void updateBasePointInTime(LocalDate basePointInTime) {
+    this.basePointInTime = basePointInTime;
+  }
+
+  public void updateBaseIndex(BigDecimal baseIndex) {
+    this.baseIndex = baseIndex;
+  }
 }

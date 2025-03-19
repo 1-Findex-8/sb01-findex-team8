@@ -1,7 +1,7 @@
 package com.example.findex.dto.indexinfo;
 
-import java.time.LocalDate;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public record UpdateIndexInfoRequest(
     int employedItemsCount,

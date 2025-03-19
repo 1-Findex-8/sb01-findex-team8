@@ -46,7 +46,7 @@ public class IndexData extends BaseEntity {
   private BigDecimal lowPrice;
 
   @Column(nullable = false)
-  private BigDecimal variation; //dto에서 versus로 사용
+  private BigDecimal versus; //dto에서 versus로 사용
 
   @Column(nullable = false)
   private BigDecimal fluctuationRate;
@@ -58,7 +58,34 @@ public class IndexData extends BaseEntity {
   private Long tradingPrice;
 
   @Column(nullable = false)
-  private Long marketCapitalization; //dto 에서 marketTotalAmount
+  private Long marketTotalAmount; //dto 에서 marketTotalAmount
 
+  public void updateMarketPrice(BigDecimal marketPrice) {
+    this.marketPrice = marketPrice;
+  }
+
+  public void updateClosingPrice(BigDecimal closingPrice) {
+    this.closingPrice = closingPrice;
+  }
+
+  public void updateHighPrice(BigDecimal highPrice) {
+    this.highPrice = highPrice;
+  }
+
+  public void updateLowPrice(BigDecimal lowPrice) {
+    this.lowPrice = lowPrice;
+  }
+
+  public void updateVariation(BigDecimal versus) {
+    this.versus = versus;
+  }
+
+  public void updateFluctuationRate(BigDecimal fluctuationRate) {
+    this.fluctuationRate = fluctuationRate;
+  }
+
+  public void updateTradingQuantity(Long tradingQuantity) {
+    this.tradingQuantity = tradingQuantity;
+  }
 }
 

@@ -11,11 +11,13 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SyncJobs extends BaseEntity {
 
