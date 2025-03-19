@@ -4,6 +4,7 @@ import com.example.findex.dto.indexinfo.IndexInfoDto;
 import com.example.findex.entity.IndexInfo;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,7 +38,7 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
       "CASE WHEN :sortField = 'indexClassification' THEN i.indexClassification END ASC, " +
       "CASE WHEN :sortField = 'indexName' THEN i.indexName END ASC, " +
       "CASE WHEN :sortField = 'employedItemsCount' THEN i.employeeItemsCount END ASC")
-  List<IndexInfoDto> findByFilters(@Param("indexClassification") String indexClassification,
+  Page<IndexInfoDto> findByFilters(@Param("indexClassification") String indexClassification,
       @Param("indexName") String indexName,
       @Param("favorite") boolean favorite,
       @Param("idAfter") Long idAfter,
