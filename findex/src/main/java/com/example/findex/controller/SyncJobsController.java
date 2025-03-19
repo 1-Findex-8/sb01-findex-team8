@@ -66,4 +66,9 @@ public class SyncJobsController {
         .body(syncJobsService.findSyncJobList(jobType, indexInfoId, baseDateFrom, baseDateTo, worker,
         jobTimeFrom, jobTimeTo, status, idAfter, cursor, sortField, sortDirection, size));
   }
+
+  @GetMapping("/test")
+  public void test() {
+    syncJobsService.run();
+  }
 }

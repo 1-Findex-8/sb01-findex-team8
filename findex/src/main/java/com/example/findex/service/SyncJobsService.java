@@ -5,6 +5,7 @@ import com.example.findex.dto.syncjobs.response.CursorPageResponseSyncJobDto;
 import com.example.findex.dto.syncjobs.response.GetStockMarketIndexResponse;
 import com.example.findex.dto.syncjobs.response.Item;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
+import com.example.findex.entity.AutoSyncConfigs;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.JobType;
@@ -14,6 +15,7 @@ import com.example.findex.entity.SyncJobs;
 import com.example.findex.mapper.SyncJobsMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.autosyncconfigs.AutoSyncConfigsRepository;
 import com.example.findex.repository.syncjob.SyncJobRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -22,6 +24,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +37,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -52,6 +56,7 @@ public class SyncJobsService {
   private final SyncJobRepository syncJobRepository;
   private final IndexInfoRepository indexInfoRepository;
   private final IndexDataRepository indexDataRepository;
+  private final AutoSyncConfigsRepository autoSyncConfigsRepository;
 
   private final SyncJobsMapper syncJobsMapper;
 
@@ -107,7 +112,8 @@ public class SyncJobsService {
     String worker = getIp(httpServletRequest);
     List<SyncJobs> syncJobsList = new ArrayList<>();
     indexInfos.forEach(
-      indexInfo -> syncJobsList.addAll(callApi(indexInfo, request, worker))
+      indexInfo -> syncJobsList
+          .addAll(callApi(indexInfo, request.baseDateFrom(), request.baseDateTo(), worker))
     );
 
     return syncJobsMapper.toSyncJobsDtoList(syncJobsList);
@@ -124,6 +130,33 @@ public class SyncJobsService {
         baseDateFrom, baseDateTo, worker, jobTimeFrom, jobTimeTo, status, idAfter, cursor, pageable);
 
     return syncJobsMapper.toCursorPageResponseSyncJobDto(page);
+  }
+
+  @Scheduled
+  @Transactional
+  public void run() {
+    // 1. 자동 연동 설정이 true 인 indexInfo 조회 -> indexInfoList
+    List<AutoSyncConfigs> autoSyncConfigsList = autoSyncConfigsRepository.findAllByActive(true);
+    List<IndexInfo> indexInfoList = autoSyncConfigsList.stream()
+        .map(autoSyncConfigs -> autoSyncConfigs.getIndexInfo())
+        .toList();
+
+    // 2. indexInfoList 순회
+        // indexInfo에 대한 syncJob 중 jobTime 가장 최근 ~ 오늘 -> 외부 api 조회
+    indexInfoList.forEach(
+        indexInfo -> {
+          Optional<SyncJobs> syncJobs = syncJobRepository
+              .findTop1ByIndexInfoAndJobTypeOrderByJobTimeDesc(indexInfo, JobType.INDEX_DATA);
+
+          LocalDate baseDateFrom = LocalDate.of(2025, Month.MARCH, 18); // 20250301
+
+          if(syncJobs.isPresent()) {
+            baseDateFrom = syncJobs.get().getJobTime().toLocalDate();
+          }
+          callApi(indexInfo, baseDateFrom, LocalDate.now(), "system");
+        }
+    );
+    // 3. 저장
   }
 
   private Pageable getPageable(String sortField, String sortDirection, int size) {
@@ -145,8 +178,8 @@ public class SyncJobsService {
       return indexInfo;
     }
 
-    // 기존 indexInfo 가 없다면 새로 저장
-    return indexInfoRepository.save(
+    // 기존 indexInfo 가 없다면 새로 저장, AutoSyncConfigs 저장
+    IndexInfo indexInfo = indexInfoRepository.save(
         new IndexInfo(
             item.idxCsf(),
             item.idxNm(),
@@ -157,12 +190,17 @@ public class SyncJobsService {
             false
         )
     );
+
+    autoSyncConfigsRepository.save(
+        new AutoSyncConfigs(true, indexInfo)
+    );
+
+    return indexInfo;
   }
 
-  private List<SyncJobs> callApi(IndexInfo indexInfo, IndexDataSyncRequest request, String worker) {
+  private List<SyncJobs> callApi(IndexInfo indexInfo, LocalDate baseDateFrom, LocalDate baseDateTo,
+      String worker) {
     String indexName = indexInfo.getIndexName();
-    LocalDate baseDateFrom = request.baseDateFrom();
-    LocalDate baseDateTo = request.baseDateTo();
 
     List<Item> items = new ArrayList<>();
 
