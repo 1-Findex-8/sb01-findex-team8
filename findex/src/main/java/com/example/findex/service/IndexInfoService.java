@@ -8,11 +8,10 @@ import com.example.findex.dto.indexinfo.SortDirectionType;
 import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.ErrorCode;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicate;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidCursor;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidSortField;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFound;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicateException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidCursorException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidSortFieldException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexInfoMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
@@ -35,7 +34,7 @@ public class IndexInfoService {
   public IndexInfoDto create(CreateIndexInfoRequest request, SourceType sourceType, boolean favorite) {
 
     if (indexInfoRepository.existsByIndexClassificationAndIndexName(request.indexClassification(), request.indexName())) {
-      throw new IndexInfoDuplicate();
+      throw new IndexInfoDuplicateException();
     }
 
     IndexInfo indexInfo = new IndexInfo(
@@ -52,7 +51,7 @@ public class IndexInfoService {
 
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
     IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
-        .orElseThrow(IndexInfoNotFound::new);
+        .orElseThrow(IndexInfoNotFoundException::new);
 
     indexInfo.updateEmployeeItemsCount(request.employedItemsCount());
     indexInfo.updateBasePointInTime(request.basePointInTime());
@@ -65,7 +64,7 @@ public class IndexInfoService {
   public IndexInfoDto findById(Long indexInfoId) {
     return indexInfoMapper.toDto(
         indexInfoRepository.findById(indexInfoId)
-            .orElseThrow(IndexInfoNotFound::new));
+            .orElseThrow(IndexInfoNotFoundException::new));
   }
 
   public CursorPageResponseIndexInfoDto findList(
@@ -85,13 +84,13 @@ public class IndexInfoService {
       try {
         parsedCursor = Long.parseLong(cursor);
       } catch (NumberFormatException e) {
-        throw new IndexInfoInvalidCursor("커서의 값이 적절하지 않습니다.");
+        throw new IndexInfoInvalidCursorException("커서의 값이 적절하지 않습니다.");
       }
     }
 
     // 커서값과 idAfter가 주어졌다면 비교하여 일관성 검증
     if (cursor != null && idAfter != null && !idAfter.equals(parsedCursor)) {
-      throw new IndexInfoInvalidCursor("커서의 값과 idAfter의 값이 같지 않습니다.");
+      throw new IndexInfoInvalidCursorException("커서의 값과 idAfter의 값이 같지 않습니다.");
     }
 
     // 정렬 조건 설정
@@ -152,7 +151,7 @@ public class IndexInfoService {
             ? Sort.Order.asc("employedItemsCount")
             : Sort.Order.desc("employedItemsCount");
       default:
-        throw new IndexInfoInvalidSortField(ErrorCode.INDEX_INFO_INVALID_SORT_FIELD.getMessage());
+        throw new IndexInfoInvalidSortFieldException();
     }
   }
 
@@ -166,7 +165,7 @@ public class IndexInfoService {
   public void delete(Long id) {
     indexInfoRepository.deleteById(id);
     IndexInfo indexInfo = indexInfoRepository.findById(id)
-        .orElseThrow(() -> new IndexInfoNotFound(ErrorCode.INDEX_INFO_NOT_FOUND.getMessage()));
+        .orElseThrow(IndexInfoNotFoundException::new);
     indexDataRepository.deleteByIndexInfo(indexInfo);
   }
 }
