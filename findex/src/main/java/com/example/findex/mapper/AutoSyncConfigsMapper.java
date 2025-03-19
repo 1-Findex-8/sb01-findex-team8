@@ -18,8 +18,6 @@ public interface AutoSyncConfigsMapper {
   AutoSyncConfigsDto toAutoSyncConfigsDto(AutoSyncConfigs autoSyncConfigs);
 
   List<AutoSyncConfigsDto> toAutoSyncConfigsDtoList(List<AutoSyncConfigs> autoSyncConfigsList);
-  
-//  CursorPageResponseAutoSyncConfigDto toCursorPageResponseAutoSyncConfigDto(Page<AutoSyncConfigs> page);
 
   default CursorPageResponseAutoSyncConfigDto toCursorPageResponseAutoSyncConfigDto(
       Page<AutoSyncConfigs> page) {

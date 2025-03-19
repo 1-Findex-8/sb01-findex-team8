@@ -45,7 +45,6 @@ public class AutoSyncConfigsCustomRepositoryImpl implements AutoSyncConfigsCusto
 
     // 데이터 조회
     List<AutoSyncConfigs> content = query
-        .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetch();
 
