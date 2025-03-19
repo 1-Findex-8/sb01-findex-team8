@@ -20,3 +20,6 @@ spring:
 open-api:
   encoding-service-key: ${DEV.OPEN_API.ENCODING_SERVICE_KEY}
   decoding-service-key: ${DEV.OPEN_API.DECODING_SERVICE_KEY}
+
+schedule:
+  cron: 0 0 1 * * * # 매일 새벽 1시

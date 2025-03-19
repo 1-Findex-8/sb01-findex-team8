@@ -37,6 +37,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
+@EnableScheduling
 public class SyncJobsService {
 
   private static final String BASE_URL = "https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService";
@@ -132,9 +134,9 @@ public class SyncJobsService {
     return syncJobsMapper.toCursorPageResponseSyncJobDto(page);
   }
 
-  @Scheduled
+  @Scheduled(cron = "${schedule.cron}", zone = "Asia/Seoul")
   @Transactional
-  public void run() {
+  public void syncIndexDataByBatch() {
     // 1. 자동 연동 설정이 true 인 indexInfo 조회 -> indexInfoList
     List<AutoSyncConfigs> autoSyncConfigsList = autoSyncConfigsRepository.findAllByActive(true);
     List<IndexInfo> indexInfoList = autoSyncConfigsList.stream()
@@ -273,7 +275,7 @@ public class SyncJobsService {
     );
   }
 
-  public GetStockMarketIndexResponse getStockMarketIndexResponse(){
+  private GetStockMarketIndexResponse getStockMarketIndexResponse(){
     String url = BASE_URL + STOCK_MARKET_INDEX
         + "?serviceKey=" + encodingServiceKey
         + "&resultType=json"
@@ -284,7 +286,7 @@ public class SyncJobsService {
     return restTemplate.getForObject(uri, GetStockMarketIndexResponse.class);
   }
 
-  public GetStockMarketIndexResponse getStockMarketIndexResponse(
+  private GetStockMarketIndexResponse getStockMarketIndexResponse(
       String indexName, LocalDate baseDateFrom, LocalDate baseDataTo, int pageNum){
     String encodedIndexName = URLEncoder.encode(indexName, StandardCharsets.UTF_8);
 
