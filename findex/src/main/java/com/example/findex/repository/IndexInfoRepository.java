@@ -19,20 +19,15 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
 
   List<IndexInfo> findAll();
 
-  List<IndexInfo> findByIndexClassificationContaining(String indexClassification);
-
-  List<IndexInfo> findByIndexNameContaining(String indexName);
-
   List<IndexInfo> findByFavorite(boolean favorite);
-
-  boolean existsByIndexClassificationAndIndexName(String classification, String name);
-
-  void deleteById(Long indexInfoId);
 
   Optional<IndexInfo> findByIndexClassificationAndIndexName(String classification, String name);
 
   List<IndexInfo> findByIndexClassification(String classification);  // 임시 추가, 수정 필요
 
+  boolean existsByIndexClassificationAndIndexName(String classification, String name);
+
+  void deleteById(Long indexInfoId);
 
   @Query("SELECT i FROM IndexInfo i WHERE " +
       "(i.indexClassification LIKE %:indexClassification% OR :indexClassification IS NULL) AND " +
