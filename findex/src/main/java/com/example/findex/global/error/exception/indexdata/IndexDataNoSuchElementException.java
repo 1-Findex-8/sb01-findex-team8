@@ -9,7 +9,7 @@ public class IndexDataNoSuchElementException extends BusinessException {
     super(ErrorCode.INDEXDATA_NOT_FOUND);
   }
 
-  public IndexDataNoSuchElementException(String message) {
-    super(ErrorCode.INDEXDATA_NOT_FOUND,message);
+  public IndexDataNoSuchElementException(String details) {
+    super(ErrorCode.INDEXDATA_NOT_FOUND,details);
   }
 }

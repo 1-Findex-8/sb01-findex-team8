@@ -7,7 +7,7 @@ public class IndexDataBadRequestException extends BusinessException {
   public IndexDataBadRequestException(){
     super(ErrorCode.INDEXDATA_BAD_REQUEST);
   }
-  public IndexDataBadRequestException(String message) {
-    super(ErrorCode.INDEXDATA_BAD_REQUEST,message);
+  public IndexDataBadRequestException(String details) {
+    super(ErrorCode.INDEXDATA_BAD_REQUEST,details);
   }
 }

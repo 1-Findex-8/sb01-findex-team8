@@ -9,7 +9,7 @@ public class IndexDataIntegrityViolationException extends BusinessException {
     super(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION);
   }
 
-  public IndexDataIntegrityViolationException(String message) {
-    super(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION, message);
+  public IndexDataIntegrityViolationException(String details) {
+    super(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION, details);
   }
 }

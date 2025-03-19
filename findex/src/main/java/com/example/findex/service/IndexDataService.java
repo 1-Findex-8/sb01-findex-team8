@@ -50,10 +50,10 @@ public class IndexDataService {
     //중복 체크
     if (indexDataRepository.existsByIndexInfoIdAndBaseDate(request.indexInfoId(),
         request.baseDate())) {
-      throw new IndexDataInternalServerErrorException(ErrorCode.INDEXDATA_INTEGRITY_VIOLATION.getMessage());
+      throw new IndexDataInternalServerErrorException();
     }
     IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
-        .orElseThrow(() -> new IndexDataNoSuchElementException(ErrorCode.INDEXDATA_NOT_FOUND.getMessage()));
+        .orElseThrow(IndexDataNoSuchElementException::new);
 
     //사용자가 생성
     IndexData indexData = new IndexData(
@@ -81,7 +81,7 @@ public class IndexDataService {
 
     //정렬필드가 sourceType이면 예외 발생
     if("sourceType".equalsIgnoreCase(sortField)) {
-      throw new IndexDataBadRequestException(ErrorCode.INDEXDATA_BAD_REQUEST.getMessage());
+      throw new IndexDataBadRequestException();
     }
 
     //커서값이 있으면 페이지 번호 계산
@@ -138,7 +138,7 @@ public class IndexDataService {
   //지수 데이터 업데이트
   public IndexDataDto updateIndexData(Long id, IndexDataUpdateRequest request) {
     IndexData updateIndexData = indexDataRepository.findById(id)
-        .orElseThrow(()->new IndexDataNoSuchElementException(ErrorCode.INDEXDATA_NOT_FOUND.getMessage()));
+        .orElseThrow(()->new IndexDataNoSuchElementException());
 
     if(request.marketPrice() != null){
       updateIndexData.updateMarketPrice(request.marketPrice());

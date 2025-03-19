@@ -8,7 +8,7 @@ public class IndexDataInternalServerErrorException extends BusinessException {
     super(ErrorCode.INDEXDATA_INTERNAL_SERVER_ERROR);
   }
 
-  public IndexDataInternalServerErrorException(String message) {
-    super(ErrorCode.INDEXDATA_INTERNAL_SERVER_ERROR,message);
+  public IndexDataInternalServerErrorException(String details) {
+    super(ErrorCode.INDEXDATA_INTERNAL_SERVER_ERROR,details);
   }
 }
