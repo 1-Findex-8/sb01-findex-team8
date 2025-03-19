@@ -1,10 +1,8 @@
+# --- 기타 파일 ---
 HELP.md
-./.gradle/
-./.idea/
-./gradle
-./gradlew
-./github/
-.idea/
+.github/
+
+# --- Gradle / 빌드 산출물 ---
 .gradle/
 gradle/
 gradlew
@@ -12,7 +10,7 @@ gradlew
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###fi
+# --- STS (Spring Tool Suite) ---
 .apt_generated
 .classpath
 .factorypath
@@ -24,7 +22,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### IntelliJ IDEA ###
+# --- IntelliJ IDEA ---
 .idea/
 *.iws
 *.iml
@@ -33,14 +31,16 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-### NetBeans ###
+# --- NetBeans ---
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
+# --- VS Code ---
 .vscode/
+
+# --- 민감 정보(Secret) ---
 src/main/resources/secret.yml
 secret.yml
