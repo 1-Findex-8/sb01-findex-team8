@@ -33,10 +33,10 @@ out/
 
 # --- NetBeans ---
 /nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
 # --- VS Code ---
 .vscode/
@@ -44,3 +44,6 @@ out/
 # --- 민감 정보(Secret) ---
 src/main/resources/secret.yml
 secret.yml
+
+# --- 빌드 산출물 ---
+findex/build/
