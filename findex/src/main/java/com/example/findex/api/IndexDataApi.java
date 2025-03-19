@@ -101,4 +101,6 @@ public interface IndexDataApi {
       @Parameter(description = "정렬 방향 (asc, desc)") String sortDirection,
       @Parameter(description = "페이지 크기") int size
   );
+
+  //
 }
