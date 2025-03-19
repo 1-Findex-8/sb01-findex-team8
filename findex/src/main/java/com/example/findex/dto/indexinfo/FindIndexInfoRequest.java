@@ -6,7 +6,7 @@ public record FindIndexInfoRequest(
     boolean favorite,
     Long idAfter,
     String cursor,
-    SortFieldType sortField,
+    String sortField,
     SortDirectionType sortDirection,
     int size
 ) {

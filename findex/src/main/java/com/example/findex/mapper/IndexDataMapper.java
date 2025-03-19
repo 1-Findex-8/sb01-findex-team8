@@ -10,4 +10,6 @@ public interface IndexDataMapper {
 
   @Mapping(source = "indexInfo.id",target = "indexInfoId")
   IndexDataDto toDto(IndexData indexData);
+
+
 }
