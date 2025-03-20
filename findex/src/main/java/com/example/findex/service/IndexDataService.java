@@ -11,7 +11,7 @@ import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.exception.indexInfo.IndexInfoNotFoundException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
 import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
@@ -136,39 +136,40 @@ public class IndexDataService {
   //지수 데이터 업데이트
   public IndexDataDto updateIndexData(Long id, IndexDataUpdateRequest request) {
     IndexData updateIndexData = indexDataRepository.findById(id)
-        .orElseThrow(()->new IndexDataNoSuchElementException());
+        .orElseThrow(() -> new IndexDataNoSuchElementException());
 
-    if(request.marketPrice() != null){
+    if (request.marketPrice() != null) {
       updateIndexData.updateMarketPrice(request.marketPrice());
     }
-    if(request.closingPrice() != null){
+    if (request.closingPrice() != null) {
       updateIndexData.updateClosingPrice(request.closingPrice());
     }
-    if(request.highPrice() != null){
+    if (request.highPrice() != null) {
       updateIndexData.updateHighPrice(request.highPrice());
     }
-    if(request.lowPrice() != null){
+    if (request.lowPrice() != null) {
       updateIndexData.updateLowPrice(request.lowPrice());
     }
-    if(request.versus() != null){
+    if (request.versus() != null) {
       updateIndexData.updateVariation(request.versus());
     }
-    if(request.fluctuationRate() != null){
+    if (request.fluctuationRate() != null) {
       updateIndexData.updateFluctuationRate(request.fluctuationRate());
     }
-    if(request.tradingQuantity() != null){
+    if (request.tradingQuantity() != null) {
       updateIndexData.updateTradingQuantity(request.tradingQuantity());
     }
-    if(request.tradingPrice() != null){
+    if (request.tradingPrice() != null) {
       updateIndexData.updateTradingPrice(request.tradingPrice());
     }
-    if(request.marketTotalAmount() != null){
+    if (request.marketTotalAmount() != null) {
       updateIndexData.updateMarketTotalAmount(request.marketTotalAmount());
     }
 
     IndexData updated = indexDataRepository.save(updateIndexData);
 
     return indexDataMapper.toDto(updated);
+  }
 
   public void delete(Long id) {
     if(indexDataRepository.existsById(id)) {

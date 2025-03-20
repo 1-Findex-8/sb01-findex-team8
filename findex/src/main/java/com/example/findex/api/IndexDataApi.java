@@ -135,7 +135,11 @@ public interface IndexDataApi {
       ),
       @ApiResponse(
           responseCode = "404",
-          description = "수정할 지수 데이터를 찾을 수 없음",
+          description = "수정할 지수 데이터를 찾을 수 없음"),
+  })
+  ResponseEntity<IndexDataDto> updateIndexData(
+      @Parameter(description = "지수 데이터 ID") Long id,@RequestBody IndexDataUpdateRequest indexDataUpdateRequest);
+
   //DELETE /api/index-data/{id}
   @Operation(
       summary = "지수 데이터 삭제",
@@ -161,9 +165,6 @@ public interface IndexDataApi {
           )
       )
   })
-  ResponseEntity<IndexDataDto> updateIndexData(
-      @Parameter(description = "지수 데이터 ID") Long id,@RequestBody IndexDataUpdateRequest indexDataUpdateRequest);
-
   ResponseEntity<Void> deleteIndexData(@Parameter(description = "지수 데이터 ID",required = true) Long indexInfoId);
   @Operation(summary = "관심 지수 성과 조회", description = "사용자의 관심 지수 목록을 기준으로 성과를 조회합니다.")
   @ApiResponses({

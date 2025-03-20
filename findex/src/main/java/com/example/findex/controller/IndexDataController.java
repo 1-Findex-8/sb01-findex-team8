@@ -96,8 +96,9 @@ public class IndexDataController implements IndexDataApi {
   @Override
   public ResponseEntity<IndexDataDto> updateIndexData(
       @PathVariable Long id, @RequestBody IndexDataUpdateRequest indexDataUpdateRequest) {
-    IndexDataDto response = indexDataService.updateIndexData(id,indexDataUpdateRequest);
+    IndexDataDto response = indexDataService.updateIndexData(id, indexDataUpdateRequest);
     return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
 
   @DeleteMapping("/{id}")
   @Override
