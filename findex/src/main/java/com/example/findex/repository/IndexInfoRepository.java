@@ -27,6 +27,6 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
 
   Optional<IndexInfo> findByIndexClassificationAndIndexName(String classification, String name);
 
-  List<IndexInfo> findByIndexClassification(String classification); // 임시 추가
+  List<IndexInfo> findByIndexClassification(String classification);  // 임시 추가, 수정 필요
 
 }

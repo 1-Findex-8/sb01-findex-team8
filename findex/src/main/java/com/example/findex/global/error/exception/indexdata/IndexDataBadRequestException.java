@@ -5,9 +5,9 @@ import com.example.findex.global.error.exception.BusinessException;
 
 public class IndexDataBadRequestException extends BusinessException {
   public IndexDataBadRequestException(){
-    super(ErrorCode.INDEX_BAD_REQUEST);
+    super(ErrorCode.INDEX_DATA_BAD_REQUEST);
   }
-  public IndexDataBadRequestException(String message) {
-    super(ErrorCode.INDEX_BAD_REQUEST,message);
+  public IndexDataBadRequestException(String details) {
+    super(ErrorCode.INDEX_DATA_BAD_REQUEST,details);
   }
 }

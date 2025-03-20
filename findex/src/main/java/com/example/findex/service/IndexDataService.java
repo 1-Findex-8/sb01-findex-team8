@@ -2,6 +2,7 @@ package com.example.findex.service;
 
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.request.IndexDataUpdateRequest;
 import com.example.findex.dto.indexdata.response.ChartDataPoint;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.IndexChartDto;
@@ -10,7 +11,6 @@ import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.ErrorCode;
 import com.example.findex.global.error.exception.indexInfo.IndexInfoNotFoundException;
 import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
 import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
@@ -48,10 +48,10 @@ public class IndexDataService {
     //중복 체크
     if (indexDataRepository.existsByIndexInfoIdAndBaseDate(request.indexInfoId(),
         request.baseDate())) {
-      throw new IndexDataInternalServerErrorException(ErrorCode.INDEX_DATA_INTEGRITY_VIOLATION.getMessage());
+      throw new IndexDataInternalServerErrorException();
     }
     IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
-        .orElseThrow(() -> new IndexDataNoSuchElementException(ErrorCode.INDEX_NOT_FOUND.getMessage()));
+        .orElseThrow(IndexDataNoSuchElementException::new);
 
     //사용자가 생성
     IndexData indexData = new IndexData(
@@ -79,7 +79,7 @@ public class IndexDataService {
 
     //정렬필드가 sourceType이면 예외 발생
     if("sourceType".equalsIgnoreCase(sortField)) {
-      throw new IndexDataBadRequestException(ErrorCode.INDEX_BAD_REQUEST.getMessage());
+      throw new IndexDataBadRequestException();
     }
 
     //커서값이 있으면 페이지 번호 계산
@@ -132,6 +132,45 @@ public class IndexDataService {
   private String encodeCursor(Long id) {
     return Base64.getEncoder().encodeToString(String.format("{\"id\":%d}", id).getBytes());
   }
+
+  //지수 데이터 업데이트
+  public IndexDataDto updateIndexData(Long id, IndexDataUpdateRequest request) {
+    IndexData updateIndexData = indexDataRepository.findById(id)
+        .orElseThrow(()->new IndexDataNoSuchElementException());
+
+    if(request.marketPrice() != null){
+      updateIndexData.updateMarketPrice(request.marketPrice());
+    }
+    if(request.closingPrice() != null){
+      updateIndexData.updateClosingPrice(request.closingPrice());
+    }
+    if(request.highPrice() != null){
+      updateIndexData.updateHighPrice(request.highPrice());
+    }
+    if(request.lowPrice() != null){
+      updateIndexData.updateLowPrice(request.lowPrice());
+    }
+    if(request.versus() != null){
+      updateIndexData.updateVariation(request.versus());
+    }
+    if(request.fluctuationRate() != null){
+      updateIndexData.updateFluctuationRate(request.fluctuationRate());
+    }
+    if(request.tradingQuantity() != null){
+      updateIndexData.updateTradingQuantity(request.tradingQuantity());
+    }
+    if(request.tradingPrice() != null){
+      updateIndexData.updateTradingPrice(request.tradingPrice());
+    }
+    if(request.marketTotalAmount() != null){
+      updateIndexData.updateMarketTotalAmount(request.marketTotalAmount());
+    }
+
+    IndexData updated = indexDataRepository.save(updateIndexData);
+
+    return indexDataMapper.toDto(updated);
+  }
+
 
   @Transactional(readOnly = true)
   public List<IndexPerformanceDto> getInterestIndexPerformance(String periodType) {
@@ -209,7 +248,8 @@ public class IndexDataService {
     IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
         .orElseThrow(IndexInfoNotFoundException::new);
 
-    List<IndexInfo> indexInfoList = indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification()); // 임시 수정
+    List<IndexInfo> indexInfoList =
+        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification()); // 수정 필요
 
     // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
     List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
