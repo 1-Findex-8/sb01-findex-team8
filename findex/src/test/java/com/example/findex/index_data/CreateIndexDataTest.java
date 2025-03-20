@@ -11,7 +11,7 @@ import com.example.findex.entity.SourceType;
 import com.example.findex.entity.base.BaseEntity;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
-import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import com.example.findex.service.IndexDataService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
