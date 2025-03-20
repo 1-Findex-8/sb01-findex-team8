@@ -2,6 +2,7 @@ package com.example.findex.api;
 
 import com.example.findex.dto.indexdata.data.IndexDataDto;
 import com.example.findex.dto.indexdata.request.IndexDataCreateRequest;
+import com.example.findex.dto.indexdata.request.IndexDataUpdateRequest;
 import com.example.findex.dto.indexdata.response.CursorPageResponseIndexDataDto;
 import com.example.findex.dto.indexdata.response.ErrorResponse;
 import com.example.findex.dto.indexdata.response.IndexChartDto;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -80,7 +82,9 @@ public interface IndexDataApi {
           responseCode = "200",
           description = "지수 데이터 목록 조회 성공",
           content = @Content(
-              schema = @Schema(implementation = CursorPageResponseIndexDataDto.class)
+              schema = @Schema(
+                  implementation = CursorPageResponseIndexDataDto.class
+              )
           )
       ),
       @ApiResponse(
@@ -109,6 +113,29 @@ public interface IndexDataApi {
       @Parameter(description = "페이지 크기") int size
   );
 
+  //PATCH /api/index-data/{id}
+  @Operation(
+      summary = "지수 데이터 수정",
+      description = "기존 지수 데이터를 수정합니다."
+  )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "지수 데이터 수정 성공",
+          content = @Content(
+              schema = @Schema(implementation = IndexDataDto.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청 (유효하지 않은 데이터 값 등)",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "수정할 지수 데이터를 찾을 수 없음",
   //DELETE /api/index-data/{id}
   @Operation(
       summary = "지수 데이터 삭제",
@@ -134,6 +161,9 @@ public interface IndexDataApi {
           )
       )
   })
+  ResponseEntity<IndexDataDto> updateIndexData(
+      @Parameter(description = "지수 데이터 ID") Long id,@RequestBody IndexDataUpdateRequest indexDataUpdateRequest);
+
   ResponseEntity<Void> deleteIndexData(@Parameter(description = "지수 데이터 ID",required = true) Long indexInfoId);
   @Operation(summary = "관심 지수 성과 조회", description = "사용자의 관심 지수 목록을 기준으로 성과를 조회합니다.")
   @ApiResponses({

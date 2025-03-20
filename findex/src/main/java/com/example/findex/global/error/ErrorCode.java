@@ -13,9 +13,9 @@ public enum ErrorCode {
 
   // indexdata
   INDEX_DATA_INTEGRITY_VIOLATION(400, "중복된 지수 및 날짜 조합입니다."),
-  INDEX_BAD_REQUEST(400,"잘못된 요청입니다."),
-  INDEX_NOT_FOUND(404,"해당 ID의 지수 정보를 찾을 수 없습니다."),
-  INDEX_INTERNAL_SERVER_ERROR(500,"서버 내부 오류가 발생했습니다."),
+  INDEX_DATA_BAD_REQUEST(400,"잘못된 요청입니다."),
+  INDEX_DATA_NOT_FOUND(404,"해당 ID의 지수 정보를 찾을 수 없습니다."),
+  INDEX_DATA_INTERNAL_SERVER_ERROR(500,"서버 내부 오류가 발생했습니다."),
   
   // syncjobs
 
