@@ -5,7 +5,6 @@ import com.example.findex.entity.QIndexData;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -55,28 +54,52 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
       builder.and(indexData.id.lt(idAfter)); // 이전 ID보다 작은 데이터 조회
     }
 
-    // 기본 정렬: ID 기준 정렬 (내림차순)
+    // QueryDSL Query 생성
     JPAQuery<IndexData> query = queryFactory
         .selectFrom(indexData)
-        .where(builder)
-        .orderBy(indexData.id.desc()); // 기본적으로 ID 내림차순 정렬
+        .where(builder);
 
-    // 추가적인 정렬 조건 적용 (단일 정렬 조건만 허용)
-    if (sortField != null) {
-      PathBuilder<IndexData> path = new PathBuilder<>(IndexData.class, "indexData");
-      OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(
-          sortOrder.equals(Order.ASC) ? Order.ASC : Order.DESC,
-          path.get(sortField, Comparable.class)
-      );
-      query.orderBy(orderSpecifier);
+    // 기본 정렬: ID 기준 내림차순
+    OrderSpecifier<?> defaultSort = indexData.id.desc();
+    OrderSpecifier<?> customSort = getSortOrder(indexData, sortField, sortOrder);
+
+    if (customSort != null) {
+      query.orderBy(customSort, defaultSort);
+    } else {
+      query.orderBy(defaultSort);
     }
 
-    // 커서 페이지네이션 적용 (size만 사용, offset 없음)
+    // 커서 페이지네이션 적용
     query.limit(pageable.getPageSize());
 
     return query.fetch();
   }
-
+  private OrderSpecifier<?> getSortOrder(QIndexData indexData, String sortField, Order sortOrder) {
+    switch (sortField) {
+      case "baseDate":
+        return sortOrder == Order.ASC ? indexData.baseDate.asc() : indexData.baseDate.desc();
+      case "marketPrice":
+        return sortOrder == Order.ASC ? indexData.marketPrice.asc() : indexData.marketPrice.desc();
+      case "closingPrice":
+        return sortOrder == Order.ASC ? indexData.closingPrice.asc() : indexData.closingPrice.desc();
+      case "highPrice":
+        return sortOrder == Order.ASC ? indexData.highPrice.asc() : indexData.highPrice.desc();
+      case "lowPrice":
+        return sortOrder == Order.ASC ? indexData.lowPrice.asc() : indexData.lowPrice.desc();
+      case "versus":
+        return sortOrder == Order.ASC ? indexData.versus.asc() : indexData.versus.desc();
+      case "fluctuationRate":
+        return sortOrder == Order.ASC ? indexData.fluctuationRate.asc() : indexData.fluctuationRate.desc();
+      case "tradingQuantity":
+        return sortOrder == Order.ASC ? indexData.tradingQuantity.asc() : indexData.tradingQuantity.desc();
+      case "tradingPrice":
+        return sortOrder == Order.ASC ? indexData.tradingPrice.asc() : indexData.tradingPrice.desc();
+      case "marketTotalAmount":
+        return sortOrder == Order.ASC ? indexData.marketTotalAmount.asc() : indexData.marketTotalAmount.desc();
+      default:
+        return null; // 허용되지 않은 필드는 정렬 적용 안 함
+    }
+  }
   /**
    * 전체 데이터 개수 조회
    */
