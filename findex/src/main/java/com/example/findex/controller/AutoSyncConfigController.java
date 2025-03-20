@@ -1,8 +1,8 @@
 package com.example.findex.controller;
 
 import com.example.findex.api.AutoSyncConfigApi;
-import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
-import com.example.findex.dto.autosyncconfigs.CursorPageResponseAutoSyncConfigDto;
+import com.example.findex.dto.autosyncconfigs.response.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.response.CursorPageResponseAutoSyncConfigDto;
 import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
 import com.example.findex.service.AutoSyncConfigsService;
 import lombok.RequiredArgsConstructor;
