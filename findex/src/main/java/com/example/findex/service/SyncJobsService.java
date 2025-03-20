@@ -124,7 +124,7 @@ public class SyncJobsService {
   @Transactional(readOnly = true)
   public CursorPageResponseSyncJobDto findSyncJobList(JobType jobType, Long indexInfoId, LocalDate baseDateFrom,
       LocalDate baseDateTo, String worker, LocalDateTime jobTimeFrom, LocalDateTime jobTimeTo,
-      Result status, Long idAfter, Long cursor, String sortField, String sortDirection, int size) {
+      Result status, Long idAfter, String cursor, String sortField, String sortDirection, int size) {
     // 추후 indexInfoId에 대한 검증 추가
     Pageable pageable = getPageable(sortField, sortDirection, size);
 
@@ -175,7 +175,7 @@ public class SyncJobsService {
 
       indexInfo.updateBaseIndex(BigDecimal.valueOf(item.basIdx()));
       indexInfo.updateBasePointInTime(getLocalDate(item.basPntm()));
-      indexInfo.updateEmployeeItemsCount(item.epyItmsCnt());
+      indexInfo.updateEmployedItemsCount(item.epyItmsCnt());
 
       return indexInfo;
     }
@@ -305,7 +305,7 @@ public class SyncJobsService {
 
   private String getBaseDate() {
     LocalDate today = LocalDate.now();
-    LocalDate yesterday = today.minusDays(1);
+    LocalDate yesterday = today.minusDays(2);
     return formatLocalDate(yesterday);
   }
 

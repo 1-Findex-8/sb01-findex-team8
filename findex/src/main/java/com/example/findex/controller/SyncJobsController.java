@@ -1,5 +1,6 @@
 package com.example.findex.controller;
 
+import com.example.findex.api.SyncJobApi;
 import com.example.findex.dto.syncjobs.request.IndexDataSyncRequest;
 import com.example.findex.dto.syncjobs.response.CursorPageResponseSyncJobDto;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
@@ -23,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/sync-jobs")
 @RequiredArgsConstructor
-public class SyncJobsController {
+public class SyncJobsController implements SyncJobApi {
 
   private final SyncJobsService syncJobsService;
 
   @PostMapping("/index-infos")
   public ResponseEntity<List<SyncJobsDto>> syncIndexInfos(HttpServletRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED)
+    return ResponseEntity.status(HttpStatus.ACCEPTED)
         .body(syncJobsService.syncIndexInfos(request));
   }
 
@@ -51,7 +52,7 @@ public class SyncJobsController {
       @RequestParam(value = "jobTimeTo", required = false) LocalDateTime jobTimeTo,
       @RequestParam(value = "status", required = false) Result status,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
-      @RequestParam(value = "cursor", required = false) Long cursor,
+      @RequestParam(value = "cursor", required = false) String cursor,
       @RequestParam(value = "sortField", defaultValue = "jobTime", required = false) String sortField,
       @RequestParam(value = "sortDirection", defaultValue = "desc", required = false) String sortDirection,
       @RequestParam(value = "size", defaultValue = "10", required = false) int size
@@ -59,10 +60,5 @@ public class SyncJobsController {
     return ResponseEntity.ok()
         .body(syncJobsService.findSyncJobList(jobType, indexInfoId, baseDateFrom, baseDateTo, worker,
         jobTimeFrom, jobTimeTo, status, idAfter, cursor, sortField, sortDirection, size));
-  }
-
-  @GetMapping("/test")
-  public void test() {
-    syncJobsService.syncIndexDataByBatch();
   }
 }
