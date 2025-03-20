@@ -1,6 +1,7 @@
 package com.example.findex.api;
 
 import com.example.findex.dto.indexdata.response.ErrorResponse;
+import com.example.findex.dto.syncjobs.request.IndexDataSyncRequest;
 import com.example.findex.dto.syncjobs.response.SyncJobsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -23,7 +24,7 @@ public interface SyncJobApi {
   @ApiResponses({
       @ApiResponse(
           responseCode = "202",
-          description = "연동 작업 생성 성공",
+          description = "연동 작업 생성 성정",
           content = @Content(
               array = @ArraySchema(schema = @Schema(implementation = SyncJobsDto.class))
           )
@@ -47,6 +48,49 @@ public interface SyncJobApi {
           )
       )
   })
-  public ResponseEntity<List<SyncJobsDto>> syncIndexInfos(HttpServletRequest request);
+  ResponseEntity<List<SyncJobsDto>> syncIndexInfos(HttpServletRequest request);
+
+  @Operation(
+      summary = "지수 데이터 연동",
+      description = "Open API를 통해 지수 데이터를 연동합니다."
+  )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "202",
+          description = "연동 작업 생성 성정",
+          content = @Content(
+              array = @ArraySchema(schema = @Schema(implementation = SyncJobsDto.class))
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청 (유효하지 않은 데이터 값 등)",
+          content = @Content(
+              schema = @Schema(
+                  implementation = ErrorResponse.class
+              )
+          )
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "지수 정보를 찾을 수 없음",
+          content = @Content(
+              schema = @Schema(
+                  implementation = ErrorResponse.class
+              )
+          )
+      ),
+      @ApiResponse(
+          responseCode = "500",
+          description = "서버 오류",
+          content = @Content(
+              schema = @Schema(
+                  implementation = ErrorResponse.class
+              )
+          )
+      )
+  })
+  ResponseEntity<List<SyncJobsDto>> syncIndexData(
+      IndexDataSyncRequest request, HttpServletRequest httpServletRequest);
 
 }
