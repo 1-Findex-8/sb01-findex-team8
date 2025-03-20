@@ -46,7 +46,7 @@ public class IndexInfoService {
   }
 
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
-    IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId).orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND));
+    IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId).orElseThrow(() -> new BusinessException(ErrorCode.INDEX_NOT_FOUND));
 
     indexInfo.setEmployeeItemsCount(request.employedItemsCount());
     indexInfo.setBasePointInTime(request.basePointInTime());
@@ -59,7 +59,7 @@ public class IndexInfoService {
   public IndexInfoDto findById(Long indexInfoId) {
     return indexInfoMapper.toDto(
         indexInfoRepository.findById(indexInfoId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND)));
+            .orElseThrow(() -> new BusinessException(ErrorCode.INDEX_NOT_FOUND)));
   }
 
   public List<IndexInfoDto> findAndSort(FindIndexInfoRequest request) {
