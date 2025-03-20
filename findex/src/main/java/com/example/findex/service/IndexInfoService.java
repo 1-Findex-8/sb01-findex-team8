@@ -70,12 +70,12 @@ public class IndexInfoService {
   public CursorPageResponseIndexInfoDto findList(
       String indexClassification,
       String indexName,
-      boolean favorite,
+      Boolean favorite,
       Long idAfter,
       String cursor,
       String sortField,
       SortDirectionType sortDirection,
-      int size) {
+      Integer size) {
 
     // 커서값을 Long 타입으로 변환하여 검증
     Long parsedCursor = null;

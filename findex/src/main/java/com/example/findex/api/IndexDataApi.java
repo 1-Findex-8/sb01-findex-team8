@@ -110,7 +110,7 @@ public interface IndexDataApi {
       @Parameter(description = "커서 (다음 페이지 시작점)") String cursor,
       @Parameter(description = "정렬 필드 (baseDate, marketPrice, closingPrice, highPrice, lowPrice, versus, fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount)") String sortField,
       @Parameter(description = "정렬 방향 (asc, desc)") String sortDirection,
-      @Parameter(description = "페이지 크기") int size
+      @Parameter(description = "페이지 크기") Integer size
   );
 
   //PATCH /api/index-data/{id}

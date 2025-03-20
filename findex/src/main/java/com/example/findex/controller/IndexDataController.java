@@ -10,6 +10,7 @@ import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
 import com.example.findex.service.IndexInfoService;
+import com.querydsl.core.types.Order;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -67,14 +68,14 @@ public class IndexDataController implements IndexDataApi {
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
-  @PostMapping
+  @PostMapping("")
   @Override
   public ResponseEntity<?> createIndexData(@RequestBody IndexDataCreateRequest indexDataCreateRequest) {
     IndexDataDto response = indexDataService.create(indexDataCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @GetMapping
+  @GetMapping("")
   @Override
   public ResponseEntity<CursorPageResponseIndexDataDto> getIndexDataList(
       @RequestParam(value = "indexInfoId",required = false) Long indexInfoId,
@@ -84,11 +85,11 @@ public class IndexDataController implements IndexDataApi {
       @RequestParam(value = "cursor",required = false) String cursor,
       @RequestParam(value = "sortField",required = false, defaultValue = "baseDate") String sortField,
       @RequestParam(value = "sortDirection",required = false, defaultValue = "desc") String sortDirection,
-      @RequestParam(value = "size",required = false, defaultValue = "10") int size
+      @RequestParam(value = "size",required = false, defaultValue = "10") Integer size
   ){
     CursorPageResponseIndexDataDto response = indexDataService.findIndexDataList(
-        indexInfoId,startDate,endDate,idAfter,cursor,sortField,sortDirection,size
-    );
+        indexInfoId, startDate, endDate, idAfter,
+        sortField, "asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC, size);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
