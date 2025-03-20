@@ -37,9 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class IndexDataService {
 
-  private final IndexDataRepository indexDataRepository;
   private final IndexInfoRepository indexInfoRepository;
   private final IndexDataMapper indexDataMapper;
+  private final IndexDataRepository indexDataRepository;
 
 
   //지수 데이터 생성
@@ -76,9 +76,11 @@ public class IndexDataService {
    */
   public CursorPageResponseIndexDataDto findIndexDataList(
       Long indexInfoId, LocalDate startDate, LocalDate endDate,
-      Long idAfter, String sortField, Order sortOrder, Integer size) {
+      Long idAfter, String sortField, String sortDirection, Integer size) {
 
-    // Pageable 객체 생성 (size만 설정, 커서 페이지네이션이므로 offset 없음)
+    Order sortOrder = "asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC;
+
+    // Pageable 객체 생성 (size만 설정)
     Pageable pageable = PageRequest.of(0, size);
 
     // 데이터 조회

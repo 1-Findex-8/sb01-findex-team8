@@ -9,7 +9,6 @@ import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
-import com.querydsl.core.types.Order;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -87,7 +86,7 @@ public class IndexDataController implements IndexDataApi {
   ){
     CursorPageResponseIndexDataDto response = indexDataService.findIndexDataList(
         indexInfoId, startDate, endDate, idAfter,
-        sortField, "asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC, size);
+        sortField, sortDirection, size);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
