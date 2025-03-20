@@ -9,7 +9,6 @@ import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
-import com.example.findex.service.IndexInfoService;
 import com.querydsl.core.types.Order;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexDataController implements IndexDataApi {
 
   private final IndexDataService indexDataService;
-  private final IndexInfoService indexInfoService;
 
   @Override
   @GetMapping("/performance/favorite")

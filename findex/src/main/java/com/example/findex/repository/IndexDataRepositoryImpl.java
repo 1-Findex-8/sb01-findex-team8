@@ -30,6 +30,7 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
   @PersistenceContext
   private EntityManager entityManager;
 
+
   @Override
   public List<IndexData> findIndexData(Long indexInfoId, LocalDate startDate, LocalDate endDate,
       Long idAfter, String sortField, Order sortOrder, Pageable pageable) {
@@ -49,9 +50,11 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
       builder.and(indexData.baseDate.loe(endDate));
     }
 
-    // 이전 페이지 마지막 ID (커서 페이지네이션 적용)
     if (idAfter != null) {
-      builder.and(indexData.id.lt(idAfter)); // 이전 ID보다 작은 데이터 조회
+      builder.and(sortOrder == Order.ASC
+          ? indexData.id.gt(idAfter)  // ASC 정렬이면 idAfter보다 큰 값 조회
+          : indexData.id.lt(idAfter)  // DESC 정렬이면 idAfter보다 작은 값 조회
+      );
     }
 
     // QueryDSL Query 생성
@@ -59,14 +62,12 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
         .selectFrom(indexData)
         .where(builder);
 
-    // 기본 정렬: ID 기준 내림차순
-    OrderSpecifier<?> defaultSort = indexData.id.desc();
-    OrderSpecifier<?> customSort = getSortOrder(indexData, sortField, sortOrder);
-
-    if (customSort != null) {
-      query.orderBy(customSort, defaultSort);
+    // 단 하나의 정렬 조건만 적용
+    OrderSpecifier<?> selectedSort = getSortOrder(indexData, sortField, sortOrder);
+    if (selectedSort != null) {
+      query.orderBy(selectedSort, sortOrder == Order.ASC ? indexData.id.asc() : indexData.id.desc());
     } else {
-      query.orderBy(defaultSort);
+      query.orderBy(indexData.id.desc()); // 기본 정렬
     }
 
     // 커서 페이지네이션 적용
@@ -75,29 +76,35 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
     return query.fetch();
   }
   private OrderSpecifier<?> getSortOrder(QIndexData indexData, String sortField, Order sortOrder) {
+    if (sortField == null) {
+      return null; // 정렬 필드가 없으면 기본 정렬 적용
+    }
+
+    boolean isAscending = (sortOrder == Order.ASC);
+
     switch (sortField) {
       case "baseDate":
-        return sortOrder == Order.ASC ? indexData.baseDate.asc() : indexData.baseDate.desc();
+        return isAscending ? indexData.baseDate.asc() : indexData.baseDate.desc();
       case "marketPrice":
-        return sortOrder == Order.ASC ? indexData.marketPrice.asc() : indexData.marketPrice.desc();
+        return isAscending ? indexData.marketPrice.asc() : indexData.marketPrice.desc();
       case "closingPrice":
-        return sortOrder == Order.ASC ? indexData.closingPrice.asc() : indexData.closingPrice.desc();
+        return isAscending ? indexData.closingPrice.asc() : indexData.closingPrice.desc();
       case "highPrice":
-        return sortOrder == Order.ASC ? indexData.highPrice.asc() : indexData.highPrice.desc();
+        return isAscending ? indexData.highPrice.asc() : indexData.highPrice.desc();
       case "lowPrice":
-        return sortOrder == Order.ASC ? indexData.lowPrice.asc() : indexData.lowPrice.desc();
+        return isAscending ? indexData.lowPrice.asc() : indexData.lowPrice.desc();
       case "versus":
-        return sortOrder == Order.ASC ? indexData.versus.asc() : indexData.versus.desc();
+        return isAscending ? indexData.versus.asc() : indexData.versus.desc();
       case "fluctuationRate":
-        return sortOrder == Order.ASC ? indexData.fluctuationRate.asc() : indexData.fluctuationRate.desc();
+        return isAscending ? indexData.fluctuationRate.asc() : indexData.fluctuationRate.desc();
       case "tradingQuantity":
-        return sortOrder == Order.ASC ? indexData.tradingQuantity.asc() : indexData.tradingQuantity.desc();
+        return isAscending ? indexData.tradingQuantity.asc() : indexData.tradingQuantity.desc();
       case "tradingPrice":
-        return sortOrder == Order.ASC ? indexData.tradingPrice.asc() : indexData.tradingPrice.desc();
+        return isAscending ? indexData.tradingPrice.asc() : indexData.tradingPrice.desc();
       case "marketTotalAmount":
-        return sortOrder == Order.ASC ? indexData.marketTotalAmount.asc() : indexData.marketTotalAmount.desc();
+        return isAscending ? indexData.marketTotalAmount.asc() : indexData.marketTotalAmount.desc();
       default:
-        return null; // 허용되지 않은 필드는 정렬 적용 안 함
+        return null;
     }
   }
   /**
