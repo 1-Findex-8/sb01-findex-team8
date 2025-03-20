@@ -1,6 +1,7 @@
 package com.example.findex.api;
 
 import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.CursorPageResponseAutoSyncConfigDto;
 import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
 import com.example.findex.dto.indexdata.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,4 +50,42 @@ public interface AutoSyncConfigApi {
   ResponseEntity<AutoSyncConfigsDto> updateAutoSyncConfigs(
       @Parameter(description = "자동 연동 설정 ID") Long id, AutoSyncConfigsUpdatedRequest request);
 
+  @Operation(
+      summary = "자동 연동 설정 목록 조회",
+      description = "자동 연동 설정 목록을 조회합니다. 필터링, 정렬, 커서 기반 페이지네이션을 지원합니다."
+  )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "자동 연동 설정 목록 조회 성공",
+          content = @Content(
+              schema = @Schema(
+                  implementation = CursorPageResponseAutoSyncConfigDto.class
+              )
+          )
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청 (유효하지 않은 필터 값 등)",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      ),
+      @ApiResponse(
+          responseCode = "500",
+          description = "서버 오류",
+          content = @Content(
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
+      )
+  })
+  ResponseEntity<CursorPageResponseAutoSyncConfigDto> findAutoSyncConfigsList(
+      @Parameter(description = "지수 정보 ID") Long indexInfoId,
+      @Parameter(description = "활성화 여부") Boolean enabled,
+      @Parameter(description = "이전 페이지 마지막 요소 ID") Long idAfter,
+      @Parameter(description = "커서 (다음 페이지 시작점)") String cursor,
+      @Parameter(description = "정렬 필드 (indexInfo.indexName, enabled)") String sortField,
+      @Parameter(description = "정렬 방향 (asc, desc)") String sortDirection,
+      @Parameter(description = "페이지 크기") int size
+  );
 }

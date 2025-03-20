@@ -2,6 +2,7 @@ package com.example.findex.controller;
 
 import com.example.findex.api.AutoSyncConfigApi;
 import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.CursorPageResponseAutoSyncConfigDto;
 import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
 import com.example.findex.service.AutoSyncConfigsService;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,11 @@ public class AutoSyncConfigController implements AutoSyncConfigApi {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> findAutoSyncConfigsList(
+  public ResponseEntity<CursorPageResponseAutoSyncConfigDto> findAutoSyncConfigsList(
       @RequestParam(value = "indexInfoId", required = false) Long indexInfoId,
       @RequestParam(value = "enabled", required = false) Boolean enabled,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
-      @RequestParam(value = "cursor", required = false) Long cursor,
+      @RequestParam(value = "cursor", required = false) String cursor,
       @RequestParam(value = "sortField", defaultValue = "indexInfo.indexName", required = false) String sortField,
       @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection,
       @RequestParam(value = "size", defaultValue = "10", required = false) int size
