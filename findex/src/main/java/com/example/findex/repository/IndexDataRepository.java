@@ -20,4 +20,6 @@ public interface IndexDataRepository extends JpaRepository<IndexData,Long> , Ind
   List<IndexData> findByIndexInfoInAndBaseDateIn(List<IndexInfo> indexInfoList, List<LocalDate> beforeDate);
 
   List<IndexData> findByIndexInfoAndBaseDateBetweenOrderByBaseDateAsc(IndexInfo indexInfo, LocalDate beforeDate, LocalDate today);
+
+  void deleteByIndexInfo(IndexInfo indexInfo);
 }

@@ -1,23 +1,26 @@
 package com.example.findex.service;
 
 import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
-import com.example.findex.dto.indexinfo.FindIndexInfoRequest;
+import com.example.findex.dto.indexinfo.CursorPageResponseIndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoDto;
+import com.example.findex.dto.indexinfo.IndexInfoSummaryDto;
 import com.example.findex.dto.indexinfo.SortDirectionType;
-import com.example.findex.dto.indexinfo.SortFieldType;
 import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.ErrorCode;
-import com.example.findex.global.error.exception.BusinessException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicateException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidCursorException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidSortFieldException;
+import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexInfoMapper;
+import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.IndexInfoRepository;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,11 +29,12 @@ public class IndexInfoService {
 
   private final IndexInfoRepository indexInfoRepository;
   private final IndexInfoMapper indexInfoMapper;
+  private final IndexDataRepository indexDataRepository;
 
   public IndexInfoDto create(CreateIndexInfoRequest request, SourceType sourceType, boolean favorite) {
 
     if (indexInfoRepository.existsByIndexClassificationAndIndexName(request.indexClassification(), request.indexName())) {
-      throw new BusinessException(ErrorCode.INDEX_INFO_DUPLICATE_EXCEPTION);
+      throw new IndexInfoDuplicateException();
     }
 
     IndexInfo indexInfo = new IndexInfo(
@@ -47,12 +51,12 @@ public class IndexInfoService {
 
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
     IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
-        .orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND)); // 임시 수정
+        .orElseThrow(IndexInfoNotFoundException::new);
 
-    indexInfo.setEmployeeItemsCount(request.employedItemsCount());
-    indexInfo.setBasePointInTime(request.basePointInTime());
-    indexInfo.setBaseIndex(request.baseIndex());
-    indexInfo.setFavorite(request.favorite());
+    indexInfo.updateEmployeeItemsCount(request.employedItemsCount());
+    indexInfo.updateBasePointInTime(request.basePointInTime());
+    indexInfo.updateBaseIndex(request.baseIndex());
+    indexInfo.updateFavorite(request.favorite());
 
     return indexInfoMapper.toDto(indexInfoRepository.save(indexInfo));
   }
@@ -60,62 +64,108 @@ public class IndexInfoService {
   public IndexInfoDto findById(Long indexInfoId) {
     return indexInfoMapper.toDto(
         indexInfoRepository.findById(indexInfoId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.INDEX_INFO_NOT_FOUND))); // 임시 수정
+            .orElseThrow(IndexInfoNotFoundException::new));
   }
 
-  public List<IndexInfoDto> findAndSort(FindIndexInfoRequest request) {
-    // TODO: 수정) 조회 조건이 여러 개인 경우 모든 조건을 만족한 결과로 조회합니다.
+  public CursorPageResponseIndexInfoDto findList(
+      String indexClassification,
+      String indexName,
+      boolean favorite,
+      Long idAfter,
+      String cursor,
+      String sortField,
+      SortDirectionType sortDirection,
+      int size) {
 
-    Set<IndexInfoDto> infoSet = indexInfoRepository.findByFavorite(request.favorite()).stream().map(
-        indexInfoMapper::toDto).collect(
-        Collectors.toSet());
+    // 커서값을 Long 타입으로 변환하여 검증
+    Long parsedCursor = null;
 
-    if (request.indexClassification() == null) {
-      infoSet.addAll(indexInfoRepository.findAll().stream().map(indexInfoMapper::toDto).collect(Collectors.toSet()));
+    if (cursor != null) {
+      try {
+        parsedCursor = Long.parseLong(cursor);
+      } catch (NumberFormatException e) {
+        throw new IndexInfoInvalidCursorException("커서의 값이 적절하지 않습니다.");
+      }
+    }
+
+    // 커서값과 idAfter가 주어졌다면 비교하여 일관성 검증
+    if (cursor != null && idAfter != null && !idAfter.equals(parsedCursor)) {
+      throw new IndexInfoInvalidCursorException("커서의 값과 idAfter의 값이 같지 않습니다.");
+    }
+
+    // 정렬 조건 설정
+    Sort sort = Sort.by(getSortOrder(sortField, sortDirection));
+
+    // 페이지네이션을 위해 커서 페이지네이션 사용 (idAfter 사용)
+    Pageable pageable = PageRequest.of(0, size, sort);
+
+    // 데이터 필터링 및 커서 페이지네이션을 위한 추가 조건 설정
+    Page<IndexInfoDto> pageResult;
+
+    // cursor 또는 idAfter에 따라 조건 추가
+    if (cursor != null || idAfter != null) {
+      pageResult = indexInfoRepository.findByFilters(indexClassification, indexName, favorite, idAfter, pageable);
     } else {
-      infoSet.addAll(indexInfoRepository.findByIndexClassificationContaining(
-          request.indexClassification()).stream().map(indexInfoMapper::toDto).collect(Collectors.toSet()));
+      pageResult = indexInfoRepository.findByFilters(indexClassification, indexName, favorite, null, pageable);
     }
 
-    if (request.indexName() == null) {
-      infoSet.addAll(indexInfoRepository.findAll().stream().map(indexInfoMapper::toDto).collect(Collectors.toSet()));
-    } else {
-      infoSet.addAll(indexInfoRepository.findByIndexNameContaining(request.indexName()).stream().map(indexInfoMapper::toDto).collect(
-        Collectors.toSet()));
+    // 다음 페이지 처리
+    Long nextIdAfter = null;
+    String nextCursor = null;
+    boolean hasNext = pageResult.hasNext();
+
+    // 결과가 있을 경우 마지막 요소에 대한 처리
+    if (!pageResult.isEmpty()) {
+      IndexInfoDto lastItem = pageResult.getContent().get(pageResult.getContent().size() - 1);
+      nextIdAfter = lastItem.id();  // 마지막 요소의 ID
+      nextCursor = String.valueOf(lastItem.id());  // 커서값 (ID를 문자열로 변환)
     }
 
-    List<IndexInfoDto> infoList = new ArrayList<>(infoSet.stream().toList());
-
-    if (request.sortField().equals(SortFieldType.indexClassification)) {
-      if (request.sortDirection().equals(SortDirectionType.asc)) {
-        infoList.sort((Comparator.comparing(IndexInfoDto::indexClassification)));
-      }
-      else if (request.sortDirection().equals(SortDirectionType.desc)) {
-        infoList.sort((Comparator.comparing(IndexInfoDto::indexClassification).reversed()));
-      }
+    // idAfter 값 검증 로직 추가
+    if (cursor != null && parsedCursor != null && !parsedCursor.equals(nextIdAfter)) {
+      throw new IllegalArgumentException("Cursor mismatch: The provided cursor does not match the last item of the current page.");
     }
 
-    if (request.sortField().equals(SortFieldType.indexName)) {
-      if (request.sortDirection().equals(SortDirectionType.asc)) {
-        infoList.sort((Comparator.comparing(IndexInfoDto::indexName)));
-      }
-      else if (request.sortDirection().equals(SortDirectionType.desc)) {
-        infoList.sort((Comparator.comparing(IndexInfoDto::indexName).reversed()));
-      }
-    }
-
-    if (request.sortField().equals(SortFieldType.employedItemsCount)) {
-      if (request.sortDirection().equals(SortDirectionType.asc)) {
-        infoList.sort((Comparator.comparing(IndexInfoDto::employeeItemsCount)));
-      }
-      else if (request.sortDirection().equals(SortDirectionType.desc)) {
-        infoList.sort((Comparator.comparing(IndexInfoDto::employeeItemsCount).reversed()));
-      }
-    }
-
-    // TODO: 페이지네이션 추가
-
-    return infoList;
+    return new CursorPageResponseIndexInfoDto(
+        pageResult.getContent(),
+        nextCursor,
+        nextIdAfter,
+        size,
+        pageResult.getTotalElements(),
+        hasNext
+    );
   }
 
+  private Sort.Order getSortOrder(String sortField, SortDirectionType sortDirection) {
+    switch (sortField) {
+      case "indexClassification":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexClassification")
+            : Sort.Order.desc("indexClassification");
+      case "indexName":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("indexName")
+            : Sort.Order.desc("indexName");
+      case "employedItemsCount":
+        return sortDirection == SortDirectionType.asc
+            ? Sort.Order.asc("employedItemsCount")
+            : Sort.Order.desc("employedItemsCount");
+      default:
+        throw new IndexInfoInvalidSortFieldException();
+    }
+  }
+
+  public List<IndexInfoSummaryDto> findSummaryList() {
+    return indexInfoRepository.findAll()
+        .stream()
+        .map(indexInfoMapper::toSummaryDto)
+        .toList();
+  }
+
+  public void delete(Long id) {
+    indexInfoRepository.deleteById(id);
+    IndexInfo indexInfo = indexInfoRepository.findById(id)
+        .orElseThrow(IndexInfoNotFoundException::new);
+    indexDataRepository.deleteByIndexInfo(indexInfo);
+  }
 }

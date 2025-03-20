@@ -169,6 +169,12 @@ public class IndexDataService {
     IndexData updated = indexDataRepository.save(updateIndexData);
 
     return indexDataMapper.toDto(updated);
+
+  public void delete(Long id) {
+    if(indexDataRepository.existsById(id)) {
+      throw new IndexDataNoSuchElementException();
+    }
+    indexDataRepository.deleteById(id);
   }
 
 
@@ -206,40 +212,6 @@ public class IndexDataService {
         .collect(Collectors.toList());
   }
 
-  private LocalDate calculateStartDate(String periodType) {
-    LocalDate today = LocalDate.now();
-    return switch (periodType) {
-      case "DAILY" -> today;
-      case "WEEKLY" -> today.minusWeeks(1);
-      case "MONTHLY" -> today.minusMonths(1);
-      default -> throw new IllegalStateException("Unexpected value: " + periodType);
-    };
-  }
-
-  private Optional<IndexPerformanceDto> createIndexPerformanceDto(IndexInfo
-      indexInfo, Map<Long, IndexData> beforeDataMap, Map<Long, IndexData> currentDataMap) {
-    IndexData beforeData = beforeDataMap.get(indexInfo.getId());
-    IndexData currentData = currentDataMap.get(indexInfo.getId());
-
-    if (beforeData != null && currentData != null) {
-      double beforePrice = beforeData.getClosingPrice().doubleValue();
-      double currentPrice = currentData.getClosingPrice().doubleValue();
-      double versus = currentPrice - beforePrice;
-      double fluctuationRate = (versus / beforePrice) * 100.0;
-
-      return Optional.of(new IndexPerformanceDto(
-          indexInfo.getId().intValue(),
-          indexInfo.getIndexClassification(),
-          indexInfo.getIndexName(),
-          versus,
-          fluctuationRate,
-          currentPrice,
-          beforePrice
-      ));
-    }
-    return Optional.empty();
-  }
-
   public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, int indexInfoId, int limit) {
 
     LocalDate beforeDate = calculateStartDate(periodType);
@@ -249,7 +221,7 @@ public class IndexDataService {
         .orElseThrow(IndexInfoNotFoundException::new);
 
     List<IndexInfo> indexInfoList =
-        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification()); // 수정 필요
+        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
 
     // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
     List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
@@ -272,13 +244,11 @@ public class IndexDataService {
         .limit(limit)
         .toList();
 
-    // rank 추가 후 RankedIndexPerformanceDto로 변환
-    List<RankedIndexPerformanceDto> rankedList = IntStream.range(0, performanceList.size())
-        .mapToObj(i -> new RankedIndexPerformanceDto(performanceList.get(i), i + 1))
-        .limit(limit)
-        .collect(Collectors.toList());
 
-    return rankedList;
+      return IntStream.range(0, performanceList.size())
+          .mapToObj(i -> new RankedIndexPerformanceDto(performanceList.get(i), i + 1))
+          .limit(limit)
+          .collect(Collectors.toList());
   }
 
   public IndexChartDto getIndexChart(String periodType, int indexInfoId) {
@@ -313,6 +283,48 @@ public class IndexDataService {
     );
   }
 
+  public List<IndexData> findByFilters(
+      Long indexInfoId, LocalDate startDate, LocalDate endDate,
+      String sortField, String sortDirection
+  ) {
+    return indexDataRepository.findByFilters(
+        indexInfoId, startDate, endDate, sortField, sortDirection);
+  }
+
+  private LocalDate calculateStartDate(String periodType) {
+    LocalDate today = LocalDate.now();
+    return switch (periodType) {
+      case "DAILY" -> today;
+      case "WEEKLY" -> today.minusWeeks(1);
+      case "MONTHLY" -> today.minusMonths(1);
+      default -> throw new IllegalStateException("Unexpected value: " + periodType);
+    };
+  }
+
+  private Optional<IndexPerformanceDto> createIndexPerformanceDto(IndexInfo
+                                                                      indexInfo, Map<Long, IndexData> beforeDataMap, Map<Long, IndexData> currentDataMap) {
+    IndexData beforeData = beforeDataMap.get(indexInfo.getId());
+    IndexData currentData = currentDataMap.get(indexInfo.getId());
+
+    if (beforeData != null && currentData != null) {
+      double beforePrice = beforeData.getClosingPrice().doubleValue();
+      double currentPrice = currentData.getClosingPrice().doubleValue();
+      double versus = currentPrice - beforePrice;
+      double fluctuationRate = (versus / beforePrice) * 100.0;
+
+      return Optional.of(new IndexPerformanceDto(
+          indexInfo.getId().intValue(),
+          indexInfo.getIndexClassification(),
+          indexInfo.getIndexName(),
+          versus,
+          fluctuationRate,
+          currentPrice,
+          beforePrice
+      ));
+    }
+    return Optional.empty();
+  }
+
   private List<ChartDataPoint> calculateMovingAverage(List<ChartDataPoint> dataPoints, int period) {
     List<ChartDataPoint> maDataPoints = new ArrayList<>();
     for (int i = period - 1; i < dataPoints.size(); i++) {
@@ -324,5 +336,30 @@ public class IndexDataService {
       maDataPoints.add(new ChartDataPoint(dataPoints.get(i).date(), avg));
     }
     return maDataPoints;
+  }
+
+  private String convertToCsv(List<IndexData> indexDataList) {
+    String header = "IndexInfoId, BaseDate, ClosingPrice, HighPrice, LowPrice, Variation, FluctuationRate, TradingQuantity, TradingPrice, MarketCapitalization";
+
+    String body = indexDataList.stream()
+            .map(data -> String.join(",",
+                    String.valueOf(data.getIndexInfo().getId()),
+                    data.getBaseDate().toString(),
+                    data.getClosingPrice().toPlainString(),
+                    data.getHighPrice().toPlainString(),
+                    data.getLowPrice().toPlainString(),
+                    data.getVersus().toPlainString(),
+                    data.getFluctuationRate().toPlainString(),
+                    String.valueOf(data.getTradingQuantity()),
+                    String.valueOf(data.getTradingPrice())
+            ))
+            .collect(Collectors.joining("\n"));
+
+    return header + "\n" + body;
+  }
+
+  public String findToCsv(Long indexInfoId, LocalDate startDate, LocalDate endDate, String sortField, String sortDirection) {
+    List<IndexData> indexDataList = findByFilters(indexInfoId, startDate, endDate, sortField, sortDirection);
+    return convertToCsv(indexDataList);
   }
 }
