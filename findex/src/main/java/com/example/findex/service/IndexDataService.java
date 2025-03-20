@@ -17,7 +17,7 @@ import com.example.findex.global.error.exception.indexdata.IndexDataInternalServ
 import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
-import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
