@@ -6,7 +6,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -34,50 +33,75 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
 
   @Override
   public List<IndexData> findIndexData(Long indexInfoId, LocalDate startDate, LocalDate endDate,
-      Long idAfter, Pageable pageable) {
+      Long idAfter, String sortField, Order sortOrder, Pageable pageable) {
     QIndexData indexData = QIndexData.indexData;
     BooleanBuilder builder = new BooleanBuilder();
 
-    //indexInfoId 일치
-    builder.and(indexData.id.eq(indexInfoId));
-
-    //startDate 조건
-    if(startDate != null) {
-      builder.and(indexData.baseDate.goe(startDate));
+    // indexInfoId 필터링 (완전 일치)
+    if (indexInfoId != null) {
+      builder.and(indexData.indexInfo.id.eq(indexInfoId));
     }
 
-    //endDate 조건
-    if(endDate != null) {
+    // 날짜 범위 필터링
+    if (startDate != null) {
+      builder.and(indexData.baseDate.goe(startDate));
+    }
+    if (endDate != null) {
       builder.and(indexData.baseDate.loe(endDate));
     }
 
-    //idAfter 조건
-    if(idAfter != null) {
-      builder.and(indexData.id.gt(idAfter));
+    // 이전 페이지 마지막 ID (커서 페이지네이션 적용)
+    if (idAfter != null) {
+      builder.and(indexData.id.lt(idAfter)); // 이전 ID보다 작은 데이터 조회
     }
 
-    JPQLQuery<IndexData> query = queryFactory.selectFrom(indexData)
-        .where(builder);
+    // 기본 정렬: ID 기준 정렬 (내림차순)
+    JPAQuery<IndexData> query = queryFactory
+        .selectFrom(indexData)
+        .where(builder)
+        .orderBy(indexData.id.desc()); // 기본적으로 ID 내림차순 정렬
 
-    // Pageable 정렬 조건 적용
-    if (pageable.getSort() != null) {
-      for (Sort.Order order : pageable.getSort()) {
-        PathBuilder<IndexData> path = new PathBuilder<>(IndexData.class, "indexData");
-        Order orderDirection = order.isAscending() ? Order.ASC : Order.DESC;
-        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(
-            orderDirection,
-            path.get(order.getProperty(), Comparable.class)
-        );
-        query.orderBy(orderSpecifier);
-      }
+    // 추가적인 정렬 조건 적용 (단일 정렬 조건만 허용)
+    if (sortField != null) {
+      PathBuilder<IndexData> path = new PathBuilder<>(IndexData.class, "indexData");
+      OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(
+          sortOrder.equals(Order.ASC) ? Order.ASC : Order.DESC,
+          path.get(sortField, Comparable.class)
+      );
+      query.orderBy(orderSpecifier);
     }
 
-    // 페이징 처리
-    query.offset(pageable.getOffset()); // 조회 시작 위치
-    query.limit(pageable.getPageSize()); // 조회할 데이터 건수
+    // 커서 페이지네이션 적용 (size만 사용, offset 없음)
+    query.limit(pageable.getPageSize());
 
     return query.fetch();
   }
+
+  /**
+   * 전체 데이터 개수 조회
+   */
+  @Override
+  public long countIndexData(Long indexInfoId, LocalDate startDate, LocalDate endDate) {
+    QIndexData indexData = QIndexData.indexData;
+    BooleanBuilder builder = new BooleanBuilder();
+
+    if (indexInfoId != null) {
+      builder.and(indexData.indexInfo.id.eq(indexInfoId));
+    }
+    if (startDate != null) {
+      builder.and(indexData.baseDate.goe(startDate));
+    }
+    if (endDate != null) {
+      builder.and(indexData.baseDate.loe(endDate));
+    }
+
+    return queryFactory
+        .select(indexData.count())
+        .from(indexData)
+        .where(builder)
+        .fetchOne();
+  }
+
 
   @Transactional(readOnly = true)
   public List<IndexData> findByFilters(

@@ -65,7 +65,7 @@ public class IndexInfoController {
       @RequestParam(value = "cursor", required = false) String cursor,
       @RequestParam(value = "sortField", required = false) String sortField,
       @RequestParam(value = "sortDirection", required = false) SortDirectionType sortDirection,
-      @RequestParam(value = "size", required = false) int size
+      @RequestParam(value = "size", required = false) Integer size
       ) {
     return ResponseEntity
         .status(HttpStatus.OK)
