@@ -76,7 +76,7 @@ public class IndexDataService {
    */
   public CursorPageResponseIndexDataDto findIndexDataList(
       Long indexInfoId, LocalDate startDate, LocalDate endDate,
-      Long idAfter, String sortField, Order sortOrder, int size) {
+      Long idAfter, String sortField, Order sortOrder, Integer size) {
 
     // Pageable 객체 생성 (size만 설정, 커서 페이지네이션이므로 offset 없음)
     Pageable pageable = PageRequest.of(0, size);
