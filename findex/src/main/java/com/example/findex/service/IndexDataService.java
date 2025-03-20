@@ -140,7 +140,7 @@ public class IndexDataService {
   }
 
   public void delete(Long id) {
-    if(indexDataRepository.existsById(id)) {
+    if(!indexDataRepository.existsById(id)) {
       throw new IndexDataNoSuchElementException();
     }
     indexDataRepository.deleteById(id);
