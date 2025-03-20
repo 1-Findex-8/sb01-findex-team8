@@ -1,7 +1,7 @@
 package com.example.findex.mapper;
 
-import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
-import com.example.findex.dto.autosyncconfigs.CursorPageResponseAutoSyncConfigDto;
+import com.example.findex.dto.autosyncconfigs.response.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.response.CursorPageResponseAutoSyncConfigDto;
 import com.example.findex.entity.AutoSyncConfigs;
 import java.util.List;
 import org.mapstruct.Mapper;
