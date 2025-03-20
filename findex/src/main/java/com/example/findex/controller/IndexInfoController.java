@@ -31,19 +31,17 @@ public class IndexInfoController {
 
   @PostMapping
   public ResponseEntity<IndexInfoDto> createIndexInfo(
-      @RequestBody CreateIndexInfoRequest request,
-      @RequestParam SourceType sourceType,
-      boolean favorite) {
+      @RequestBody CreateIndexInfoRequest request) {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(indexInfoService.create(request, sourceType, favorite));
+        .body(indexInfoService.create(request));
   }
 
   @PatchMapping("{id}")
   public ResponseEntity<IndexInfoDto> updateIndexInfoById(
       @PathVariable Long id,
-      @RequestParam UpdateIndexInfoRequest request) {
+      @RequestBody UpdateIndexInfoRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(indexInfoService.update(id, request));
@@ -60,12 +58,12 @@ public class IndexInfoController {
   public ResponseEntity<CursorPageResponseIndexInfoDto> findIndexInfoList(
       @RequestParam(value = "indexClassification", required = false) String indexClassification,
       @RequestParam(value = "indexName", required = false) String indexName,
-      @RequestParam(value = "favorite", required = false) boolean favorite,
+      @RequestParam(value = "favorite", required = false) Boolean favorite,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
       @RequestParam(value = "cursor", required = false) String cursor,
       @RequestParam(value = "sortField", required = false) String sortField,
       @RequestParam(value = "sortDirection", required = false) SortDirectionType sortDirection,
-      @RequestParam(value = "size", required = false) int size
+      @RequestParam(value = "size", required = false, defaultValue = "10") int size
       ) {
     return ResponseEntity
         .status(HttpStatus.OK)

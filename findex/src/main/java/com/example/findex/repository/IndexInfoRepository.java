@@ -1,6 +1,5 @@
 package com.example.findex.repository;
 
-import com.example.findex.dto.indexinfo.IndexInfoDto;
 import com.example.findex.entity.IndexInfo;
 import java.util.List;
 import java.util.Optional;
@@ -20,30 +19,30 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
 
   List<IndexInfo> findAll();
 
-  List<IndexInfo> findByFavorite(boolean favorite);
+  List<IndexInfo> findByFavorite(Boolean favorite);
 
   Optional<IndexInfo> findByIndexClassificationAndIndexName(String classification, String name);
 
   List<IndexInfo> findByIndexClassification(String classification);  // 임시 추가, 수정 필요
 
-  boolean existsByIndexClassificationAndIndexName(String classification, String name);
+  Boolean existsByIndexClassificationAndIndexName(String classification, String name);
 
   void deleteById(Long indexInfoId);
 
   @Query("SELECT i FROM IndexInfo i WHERE " +
       "(i.indexClassification LIKE %:indexClassification% OR :indexClassification IS NULL) AND " +
       "(i.indexName LIKE %:indexName% OR :indexName IS NULL) AND " +
-      "(i.favorite = :favorite) AND " +
+      "(:favorite IS NULL OR i.favorite = :favorite) AND " +
       "(i.id > :idAfter OR :idAfter IS NULL) ORDER BY " +
       "CASE WHEN :sortField = 'indexClassification' THEN i.indexClassification END ASC, " +
       "CASE WHEN :sortField = 'indexName' THEN i.indexName END ASC, " +
-      "CASE WHEN :sortField = 'employedItemsCount' THEN i.employeeItemsCount END ASC")
-
-  Page<IndexInfoDto> findByFilters(
+      "CASE WHEN :sortField = 'employedItemsCount' THEN i.employedItemsCount END ASC")
+  Page<IndexInfo> findByFilters(
       @Param("indexClassification") String indexClassification,
       @Param("indexName") String indexName,
-      @Param("favorite") boolean favorite,
+      @Param("favorite") Boolean favorite,
       @Param("idAfter") Long idAfter,
+      @Param("sortField") String sortField,
       Pageable pageable);
 
 }

@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record UpdateIndexInfoRequest(
-    int employedItemsCount,
+    Integer employedItemsCount,
     LocalDate basePointInTime,
     BigDecimal baseIndex,
-    boolean favorite) {
+    Boolean favorite) {
 
 }

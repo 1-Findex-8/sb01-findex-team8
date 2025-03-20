@@ -8,9 +8,9 @@ public record IndexInfoDto(
     Long id,
     String indexClassification,
     String indexName,
-    int employeeItemsCount,
+    Integer employedItemsCount,
     LocalDate basePointInTime,
     BigDecimal baseIndex,
     SourceType sourceType,
-    boolean favorite) {
+    Boolean favorite) {
 }
