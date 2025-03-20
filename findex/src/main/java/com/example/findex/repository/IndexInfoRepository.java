@@ -1,6 +1,5 @@
 package com.example.findex.repository;
 
-import com.example.findex.dto.indexinfo.IndexInfoDto;
 import com.example.findex.entity.IndexInfo;
 import java.util.List;
 import java.util.Optional;
@@ -37,13 +36,13 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, Long> {
       "(i.id > :idAfter OR :idAfter IS NULL) ORDER BY " +
       "CASE WHEN :sortField = 'indexClassification' THEN i.indexClassification END ASC, " +
       "CASE WHEN :sortField = 'indexName' THEN i.indexName END ASC, " +
-      "CASE WHEN :sortField = 'employedItemsCount' THEN i.employeeItemsCount END ASC")
-
-  Page<IndexInfoDto> findByFilters(
+      "CASE WHEN :sortField = 'employeeItemsCount' THEN i.employeeItemsCount END ASC")
+  Page<IndexInfo> findByFilters(
       @Param("indexClassification") String indexClassification,
       @Param("indexName") String indexName,
       @Param("favorite") boolean favorite,
       @Param("idAfter") Long idAfter,
+      @Param("sortField") String sortField,
       Pageable pageable);
 
 }

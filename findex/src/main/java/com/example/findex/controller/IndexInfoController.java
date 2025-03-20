@@ -43,7 +43,7 @@ public class IndexInfoController {
   @PatchMapping("{id}")
   public ResponseEntity<IndexInfoDto> updateIndexInfoById(
       @PathVariable Long id,
-      @RequestParam UpdateIndexInfoRequest request) {
+      @RequestBody UpdateIndexInfoRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(indexInfoService.update(id, request));
