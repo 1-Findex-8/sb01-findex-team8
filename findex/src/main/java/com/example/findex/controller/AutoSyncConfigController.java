@@ -1,5 +1,6 @@
 package com.example.findex.controller;
 
+import com.example.findex.api.AutoSyncConfigApi;
 import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
 import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
 import com.example.findex.service.AutoSyncConfigsService;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/auto-sync-configs")
 @RequiredArgsConstructor
-public class AutoSyncConfigController {
+public class AutoSyncConfigController implements AutoSyncConfigApi {
 
   private final AutoSyncConfigsService autoSyncConfigsService;
 
