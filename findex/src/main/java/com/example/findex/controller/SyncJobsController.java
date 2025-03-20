@@ -51,7 +51,7 @@ public class SyncJobsController {
       @RequestParam(value = "jobTimeTo", required = false) LocalDateTime jobTimeTo,
       @RequestParam(value = "status", required = false) Result status,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
-      @RequestParam(value = "cursor", required = false) Long cursor,
+      @RequestParam(value = "cursor", required = false) String cursor,
       @RequestParam(value = "sortField", defaultValue = "jobTime", required = false) String sortField,
       @RequestParam(value = "sortDirection", defaultValue = "desc", required = false) String sortDirection,
       @RequestParam(value = "size", defaultValue = "10", required = false) int size

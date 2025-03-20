@@ -27,7 +27,7 @@ public class SyncJobsCustomRepositoryImpl implements SyncJobsCustomRepository {
   @Override
   public Page<SyncJobs> findSyncJobsList(JobType jobType, Long indexInfoId, LocalDate baseDateFrom,
       LocalDate baseDateTo, String worker, LocalDateTime jobTimeFrom, LocalDateTime jobTimeTo,
-      Result status, Long idAfter, Long cursor, Pageable pageable) {
+      Result status, Long idAfter, String cursor, Pageable pageable) {
 
     JPAQuery<SyncJobs> query = jpaQueryFactory.selectFrom(syncJobs);
 
