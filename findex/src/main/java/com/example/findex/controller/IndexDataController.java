@@ -96,6 +96,7 @@ public class IndexDataController implements IndexDataApi {
   public ResponseEntity<Void> deleteIndexData(@PathVariable Long id) {
     indexDataService.delete(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 
   @Override
   @GetMapping("/export/csv")
