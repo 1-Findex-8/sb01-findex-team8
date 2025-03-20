@@ -49,4 +49,4 @@ secret.yml
 findex/build/
 
 findex/.idea/
-.idea/
+.idea/.gitignore
