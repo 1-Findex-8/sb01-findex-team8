@@ -48,4 +48,5 @@ secret.yml
 # --- 빌드 산출물 ---
 findex/build/
 
-findex/.idea
+findex/.idea/
+.idea/
