@@ -27,7 +27,7 @@ public class IndexInfo extends BaseEntity {
   private String indexName;
 
   @Column(nullable = false)
-  private int employeeItemsCount;
+  private Integer employedItemsCount;
 
   @Column(nullable = false)
   private LocalDate basePointInTime;
@@ -40,10 +40,10 @@ public class IndexInfo extends BaseEntity {
   private SourceType sourceType;
 
   @Column(nullable = false)
-  private boolean favorite = false;
+  private Boolean favorite = false;
 
-  public void updateEmployeeItemsCount(int employeeItemsCount) {
-    this.employeeItemsCount = employeeItemsCount;
+  public void updateEmployedItemsCount(Integer employedItemsCount) {
+    this.employedItemsCount = employedItemsCount;
   }
 
   public void updateBasePointInTime(LocalDate basePointInTime) {
@@ -54,5 +54,5 @@ public class IndexInfo extends BaseEntity {
     this.baseIndex = baseIndex;
   }
 
-  public void updateFavorite(boolean favorite) { this.favorite = favorite; }
+  public void updateFavorite(Boolean favorite) { this.favorite = favorite; }
 }

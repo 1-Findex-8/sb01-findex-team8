@@ -9,7 +9,6 @@ import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
 import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicateException;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidCursorException;
 import com.example.findex.global.error.exception.indexinfo.IndexInfoInvalidSortFieldException;
 import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexInfoMapper;
@@ -22,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class IndexInfoService {
   private final IndexInfoMapper indexInfoMapper;
   private final IndexDataRepository indexDataRepository;
 
-  public IndexInfoDto create(CreateIndexInfoRequest request, SourceType sourceType, boolean favorite) {
+  public IndexInfoDto create(CreateIndexInfoRequest request) {
 
     if (indexInfoRepository.existsByIndexClassificationAndIndexName(request.indexClassification(), request.indexName())) {
       throw new IndexInfoDuplicateException();
@@ -43,20 +43,29 @@ public class IndexInfoService {
         request.employedItemsCount(),
         request.basePointInTime(),
         request.baseIndex(),
-        sourceType,
-        favorite);
+        SourceType.USER,
+        request.favorite());
 
     return indexInfoMapper.toDto(indexInfoRepository.save(indexInfo));
   }
 
+  @Transactional
   public IndexInfoDto update(Long indexInfoId, UpdateIndexInfoRequest request) {
     IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
         .orElseThrow(IndexInfoNotFoundException::new);
 
-    indexInfo.updateEmployeeItemsCount(request.employedItemsCount());
-    indexInfo.updateBasePointInTime(request.basePointInTime());
-    indexInfo.updateBaseIndex(request.baseIndex());
-    indexInfo.updateFavorite(request.favorite());
+    if (request.employedItemsCount() != null) {
+      indexInfo.updateEmployedItemsCount(request.employedItemsCount());
+    }
+    if (request.basePointInTime() != null) {
+      indexInfo.updateBasePointInTime(request.basePointInTime());
+    }
+    if (request.baseIndex() != null) {
+      indexInfo.updateBaseIndex(request.baseIndex());
+    }
+    if (request.favorite() != null) {
+      indexInfo.updateFavorite(request.favorite());
+    }
 
     return indexInfoMapper.toDto(indexInfoRepository.save(indexInfo));
   }
@@ -67,10 +76,11 @@ public class IndexInfoService {
             .orElseThrow(IndexInfoNotFoundException::new));
   }
 
+  @Transactional
   public CursorPageResponseIndexInfoDto findList(
       String indexClassification,
       String indexName,
-      boolean favorite,
+      Boolean favorite,
       Long idAfter,
       String cursor,
       String sortField,
@@ -153,8 +163,8 @@ public class IndexInfoService {
             : Sort.Order.desc("indexName");
       case "employedItemsCount":
         return sortDirection == SortDirectionType.asc
-            ? Sort.Order.asc("employeeItemsCount")
-            : Sort.Order.desc("employeeItemsCount");
+            ? Sort.Order.asc("employedItemsCount")
+            : Sort.Order.desc("employedItemsCount");
       default:
         throw new IndexInfoInvalidSortFieldException();
     }
@@ -167,10 +177,11 @@ public class IndexInfoService {
         .toList();
   }
 
+  @Transactional
   public void delete(Long id) {
-    indexInfoRepository.deleteById(id);
     IndexInfo indexInfo = indexInfoRepository.findById(id)
         .orElseThrow(IndexInfoNotFoundException::new);
     indexDataRepository.deleteByIndexInfo(indexInfo);
+    indexInfoRepository.deleteById(id);
   }
 }

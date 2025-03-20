@@ -3,7 +3,7 @@ package com.example.findex.dto.indexinfo;
 public record FindIndexInfoRequest(
     String indexClassification,
     String indexName,
-    boolean favorite,
+    Boolean favorite,
     Long idAfter,
     String cursor,
     String sortField,

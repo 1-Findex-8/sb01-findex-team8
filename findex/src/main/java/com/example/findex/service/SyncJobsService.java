@@ -175,7 +175,7 @@ public class SyncJobsService {
 
       indexInfo.updateBaseIndex(BigDecimal.valueOf(item.basIdx()));
       indexInfo.updateBasePointInTime(getLocalDate(item.basPntm()));
-      indexInfo.updateEmployeeItemsCount(item.epyItmsCnt());
+      indexInfo.updateEmployedItemsCount(item.epyItmsCnt());
 
       return indexInfo;
     }
