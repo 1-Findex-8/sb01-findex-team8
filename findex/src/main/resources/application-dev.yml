@@ -22,4 +22,4 @@ open-api:
   decoding-service-key: ${DEV.OPEN_API.DECODING_SERVICE_KEY}
 
 schedule:
-  cron: 0 0 1 * * * # 매일 새벽 1시
+  cron: 0 0 12 * * * # 매일 오호 12시
