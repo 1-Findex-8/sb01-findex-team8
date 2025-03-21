@@ -1,7 +1,7 @@
-package com.example.findex.global.error.exception.autosyncconfigs;
+package com.example.findex.common.error.exception.autosyncconfigs;
 
-import com.example.findex.global.error.ErrorCode;
-import com.example.findex.global.error.exception.BusinessException;
+import com.example.findex.common.error.ErrorCode;
+import com.example.findex.common.error.exception.BusinessException;
 
 public class AutoSyncConfigNotFoundException extends BusinessException {
 

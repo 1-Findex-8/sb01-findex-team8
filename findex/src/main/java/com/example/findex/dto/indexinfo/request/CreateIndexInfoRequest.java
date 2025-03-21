@@ -1,4 +1,4 @@
-package com.example.findex.dto.indexinfo;
+package com.example.findex.dto.indexinfo.request;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

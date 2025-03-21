@@ -1,4 +1,4 @@
-package com.example.findex.global.error;
+package com.example.findex.common.error;
 
 import lombok.Getter;
 

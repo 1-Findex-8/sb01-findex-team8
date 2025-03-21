@@ -1,6 +1,6 @@
-package com.example.findex.global.error.exception;
+package com.example.findex.common.error.exception;
 
-import com.example.findex.global.error.ErrorResponse;
+import com.example.findex.common.error.ErrorResponse;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;

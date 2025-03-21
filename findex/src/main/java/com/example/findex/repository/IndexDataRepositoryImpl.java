@@ -5,6 +5,7 @@ import com.example.findex.entity.QIndexData;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -158,7 +159,6 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
 
     OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(
         order, path.get(sortField, Comparable.class));
-    ;
 
     return queryFactory.selectFrom(indexData).where(builder).orderBy(orderSpecifier).fetch();
   }
