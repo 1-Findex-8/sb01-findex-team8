@@ -7,9 +7,9 @@ public record CursorPageResponseIndexInfoDto (
 
   Long nextIdAfter, // 마지막 요소의 ID
 
-  int size, // 페이지 크기
+  Integer size, // 페이지 크기
 
   Long totalElements, // 총 요소 수
 
-  boolean hasNext) {
+  Boolean hasNext) {
 }

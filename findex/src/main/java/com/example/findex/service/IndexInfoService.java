@@ -85,7 +85,7 @@ public class IndexInfoService {
       String cursor,
       String sortField,
       SortDirectionType sortDirection,
-      int size) {
+      Integer size) {
 
     cursor = null;
 

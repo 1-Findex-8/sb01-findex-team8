@@ -61,9 +61,9 @@ public class IndexInfoController {
       @RequestParam(value = "favorite", required = false) Boolean favorite,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
       @RequestParam(value = "cursor", required = false) String cursor,
-      @RequestParam(value = "sortField", required = false) String sortField,
-      @RequestParam(value = "sortDirection", required = false) SortDirectionType sortDirection,
-      @RequestParam(value = "size", required = false, defaultValue = "10") int size
+      @RequestParam(value = "sortField", required = false, defaultValue = "indexClassification") String sortField,
+      @RequestParam(value = "sortDirection", required = false, defaultValue = "desc") SortDirectionType sortDirection,
+      @RequestParam(value = "size", required = false,defaultValue = "10") Integer size
       ) {
     return ResponseEntity
         .status(HttpStatus.OK)
