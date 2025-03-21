@@ -1,0 +1,20 @@
+spring:
+  config:
+    import: secret.yml
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${USERNAME}
+    password: ${PASSWORD}
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+open-api:
+  encoding-service-key: ${ENCODING_SERVICE_KEY}
+
+schedule:
+  cron: 0 0 12 * * * # 매일 오호 12시
