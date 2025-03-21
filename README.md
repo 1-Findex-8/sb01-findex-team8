@@ -2,29 +2,30 @@
     <img src="https://github.com/user-attachments/assets/b41c8f05-fbfd-45ca-9506-19d3ab9fd71f" style="width: 100%; max-width: 1000px; height: auto;">
 </div>
 
-# Findex
+# :chart_with_upwards_trend: Findex
 
 금융 지수 데이터를 종합적으로 제공하는 대시보드 서비스
 
 ---
 
-# 팀명
+# :family: 팀명 및 팀원 구성
+### 팀명
 sb01-findex-team8
 (https://github.com/1-Findex-8/sb01-findex-team8)
 
-# 팀원 구성
+### 팀원 구성
 - 김주언 (https://github.com/wndjs803)
 - 이유빈 (https://github.com/iiyubb)
 - 손동혁 (https://github.com/sondonghyuk)
 - 장태준 (https://github.com/janghoosa)
 ---
 
-### 시연영상 및 발표자료
+### :tv: 시연영상 및 발표자료
 ![GIF](link_to_gif) 
 
 ---
 
-## 목차
+## :pushpin: 목차
 1. [프로젝트 소개](#프로젝트-소개)
 2. [기술 스택](#기술-스택)
 3. [팀원별 구현 기능](#팀원별-구현-기능)
@@ -32,13 +33,13 @@ sb01-findex-team8
 
 
 ---
-### 프로젝트 소개
+### :information_desk_person: 프로젝트 소개
 
 외부 API를 연결해 사용자에게 실시간으로 금융 지수에 대한 정보 및 데이터를 제공하고, 다양한 분석 기능을 활용하여 지수 성과를 확인할 수 있도록 합니다. 
 이 서비스를 통해 금융 시장에서 중요한 지표들을 빠르게 파악하고, 지수 차트, CSV export 등의 기능을 통해 인사이트를 도출할 수 있습니다.
 
 ---
-### 기술 스택
+### :computer: 기술 스택
 
 - **Backend**
   - Spring Boot: 애플리케이션 개발을 위한 핵심 프레임워크
@@ -54,7 +55,7 @@ sb01-findex-team8
   - Notion: 프로젝트 관리 및 문서화
 
 ---
-### 팀원별 구현 기능
+### :mag_right: 팀원별 구현 기능
 
 #### 김주언
 - **연동 작업 API**
@@ -92,7 +93,7 @@ sb01-findex-team8
 
 ---
 
-### 파일 구조
+### :file_folder: 파일 구조
 ```
    findex
    ├─ src
