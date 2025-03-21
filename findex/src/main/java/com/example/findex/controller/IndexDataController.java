@@ -36,12 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexDataController implements IndexDataApi {
 
   private final IndexDataService indexDataService;
-  private final IndexInfoService indexInfoService;
 
   @Override
   @GetMapping("/performance/favorite")
   public ResponseEntity<List<IndexPerformanceDto>> getIndexFavoritePerformanceRank(
-      @RequestParam String periodType
+      @RequestParam(required = false, defaultValue = "DAILY") String periodType
   ){
     List<IndexPerformanceDto> dto = indexDataService.getInterestIndexPerformance(periodType);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -50,9 +49,9 @@ public class IndexDataController implements IndexDataApi {
   @Override
   @GetMapping("/performance/rank")
   public ResponseEntity<List<RankedIndexPerformanceDto>> getIndexPerformanceRank(
-      @RequestParam String periodType,
-      @RequestParam int indexInfoId,
-      @RequestParam int limit) {
+      @RequestParam(required = false, defaultValue = "DAILY") String periodType,
+      @RequestParam(required = false) Integer indexInfoId,
+      @RequestParam(required = false, defaultValue = "10") Integer limit) {
     List<RankedIndexPerformanceDto> dto = indexDataService.getIndexPerformanceRank(periodType, indexInfoId, limit);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
@@ -61,7 +60,7 @@ public class IndexDataController implements IndexDataApi {
   @GetMapping("/{indexInfoId}/chart")
   public ResponseEntity<IndexChartDto> getIndexChart(
       @PathVariable int indexInfoId,
-      @RequestParam String periodType
+      @RequestParam(required = false, defaultValue = "DAILY")  String periodType
   ) {
     IndexChartDto dto = indexDataService.getIndexChart(periodType, indexInfoId);
     return ResponseEntity.status(HttpStatus.OK).body(dto);

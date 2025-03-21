@@ -213,17 +213,20 @@ public class IndexDataService {
         .collect(Collectors.toList());
   }
 
-  public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, int indexInfoId, int limit) {
+  public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, Integer indexInfoId, Integer limit) {
 
     LocalDate beforeDate = calculateStartDate(periodType);
     LocalDate today = LocalDate.now();
 
-    IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
-        .orElseThrow(IndexInfoNotFoundException::new);
+    List<IndexInfo> indexInfoList;
 
-    List<IndexInfo> indexInfoList =
-        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
-
+    if (indexInfoId == null || indexInfoId <= 0) {
+      indexInfoList = indexInfoRepository.findAll();  // 모든 IndexInfo 조회
+    } else {
+      IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
+          .orElseThrow(IndexInfoNotFoundException::new);
+      indexInfoList = indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
+    }
     // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
     List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
 
@@ -298,6 +301,8 @@ public class IndexDataService {
       case "DAILY" -> today;
       case "WEEKLY" -> today.minusWeeks(1);
       case "MONTHLY" -> today.minusMonths(1);
+      case "QUARTERLY" -> today.minusMonths(3);
+      case "YEARLY" -> today.minusYears(1);
       default -> throw new IllegalStateException("Unexpected value: " + periodType);
     };
   }
@@ -340,11 +345,10 @@ public class IndexDataService {
   }
 
   private String convertToCsv(List<IndexData> indexDataList) {
-    String header = "IndexInfoId, BaseDate, ClosingPrice, HighPrice, LowPrice, Variation, FluctuationRate, TradingQuantity, TradingPrice, MarketCapitalization";
+    String header = "기준일자, 종가, 고가, 저가, 전일대비등락, 등락률, 거래량, 거래대금, 시가총액";
 
     String body = indexDataList.stream()
             .map(data -> String.join(",",
-                    String.valueOf(data.getIndexInfo().getId()),
                     data.getBaseDate().toString(),
                     data.getClosingPrice().toPlainString(),
                     data.getHighPrice().toPlainString(),
