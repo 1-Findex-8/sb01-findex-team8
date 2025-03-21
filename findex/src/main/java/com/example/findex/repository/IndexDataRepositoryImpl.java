@@ -34,7 +34,8 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
 
   @Override
   public List<IndexData> findIndexData(Long indexInfoId, LocalDate startDate, LocalDate endDate,
-      Long idAfter, String sortField, Order sortOrder, Pageable pageable) {
+      Long idAfter, String cursor, String sortField, String sortDirection, Pageable pageable) {
+
     QIndexData indexData = QIndexData.indexData;
     BooleanBuilder builder = new BooleanBuilder();
 
@@ -51,66 +52,74 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
       builder.and(indexData.baseDate.loe(endDate));
     }
 
+    // 커서 기반 페이지네이션 조건: 정렬방향에 따라
     if (idAfter != null) {
-      builder.and(sortOrder == Order.ASC
-          ? indexData.id.gt(idAfter)  // ASC 정렬이면 idAfter보다 큰 값 조회
-          : indexData.id.lt(idAfter)  // DESC 정렬이면 idAfter보다 작은 값 조회
-      );
+      if ("asc".equalsIgnoreCase(sortDirection)) {
+        builder.and(indexData.id.gt(idAfter));
+      } else {
+        builder.and(indexData.id.lt(idAfter));
+      }
+    }
+
+    // 동적 정렬 조건 구성
+    OrderSpecifier<?> orderSpecifier;
+    if ("baseDate".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.baseDate.asc()
+          : indexData.baseDate.desc();
+    } else if ("marketPrice".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.marketPrice.asc()
+          : indexData.marketPrice.desc();
+    } else if ("closingPrice".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.closingPrice.asc()
+          : indexData.closingPrice.desc();
+    } else if ("highPrice".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.highPrice.asc()
+          : indexData.highPrice.desc();
+    } else if ("lowPrice".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.lowPrice.asc()
+          : indexData.lowPrice.desc();
+    } else if ("versus".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.versus.asc()
+          : indexData.versus.desc();
+    } else if ("fluctuationRate".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.fluctuationRate.asc()
+          : indexData.fluctuationRate.desc();
+    } else if ("tradingQuantity".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.tradingQuantity.asc()
+          : indexData.tradingQuantity.desc();
+    } else if ("tradingPrice".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.tradingPrice.asc()
+          : indexData.tradingPrice.desc();
+    } else if ("marketTotalAmount".equalsIgnoreCase(sortField)) {
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.marketTotalAmount.asc()
+          : indexData.marketTotalAmount.desc();
+    } else {
+      // 기본 정렬: id 기준
+      orderSpecifier = "asc".equalsIgnoreCase(sortDirection)
+          ? indexData.id.asc()
+          : indexData.id.desc();
     }
 
     // QueryDSL Query 생성
     JPAQuery<IndexData> query = queryFactory
         .selectFrom(indexData)
-        .where(builder);
-
-    // 단 하나의 정렬 조건만 적용
-    OrderSpecifier<?> selectedSort = getSortOrder(indexData, sortField, sortOrder);
-    if (selectedSort != null) {
-      query.orderBy(selectedSort, sortOrder == Order.ASC ? indexData.id.asc() : indexData.id.desc());
-    } else {
-      query.orderBy(indexData.id.desc()); // 기본 정렬
-    }
-
-    // 커서 페이지네이션 적용
-    query.limit(pageable.getPageSize());
+        .where(builder)
+        .orderBy(orderSpecifier);
 
     return query.fetch();
   }
-  private OrderSpecifier<?> getSortOrder(QIndexData indexData, String sortField, Order sortOrder) {
-    if (sortField == null) {
-      return null; // 정렬 필드가 없으면 기본 정렬 적용
-    }
 
-    boolean isAscending = (sortOrder == Order.ASC);
-
-    switch (sortField) {
-      case "baseDate":
-        return isAscending ? indexData.baseDate.asc() : indexData.baseDate.desc();
-      case "marketPrice":
-        return isAscending ? indexData.marketPrice.asc() : indexData.marketPrice.desc();
-      case "closingPrice":
-        return isAscending ? indexData.closingPrice.asc() : indexData.closingPrice.desc();
-      case "highPrice":
-        return isAscending ? indexData.highPrice.asc() : indexData.highPrice.desc();
-      case "lowPrice":
-        return isAscending ? indexData.lowPrice.asc() : indexData.lowPrice.desc();
-      case "versus":
-        return isAscending ? indexData.versus.asc() : indexData.versus.desc();
-      case "fluctuationRate":
-        return isAscending ? indexData.fluctuationRate.asc() : indexData.fluctuationRate.desc();
-      case "tradingQuantity":
-        return isAscending ? indexData.tradingQuantity.asc() : indexData.tradingQuantity.desc();
-      case "tradingPrice":
-        return isAscending ? indexData.tradingPrice.asc() : indexData.tradingPrice.desc();
-      case "marketTotalAmount":
-        return isAscending ? indexData.marketTotalAmount.asc() : indexData.marketTotalAmount.desc();
-      default:
-        return null;
-    }
-  }
-  /**
-   * 전체 데이터 개수 조회
-   */
+  //전체 데이터 개수 조회
   @Override
   public long countIndexData(Long indexInfoId, LocalDate startDate, LocalDate endDate) {
     QIndexData indexData = QIndexData.indexData;
@@ -126,11 +135,13 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
       builder.and(indexData.baseDate.loe(endDate));
     }
 
-    return queryFactory
+    Long count = queryFactory
         .select(indexData.count())
         .from(indexData)
         .where(builder)
         .fetchOne();
+
+    return count != null ? count : 0L;
   }
 
 

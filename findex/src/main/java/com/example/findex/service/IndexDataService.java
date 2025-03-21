@@ -76,16 +76,14 @@ public class IndexDataService {
    */
   public CursorPageResponseIndexDataDto findIndexDataList(
       Long indexInfoId, LocalDate startDate, LocalDate endDate,
-      Long idAfter, String sortField, String sortDirection, Integer size) {
-
-    Order sortOrder = "asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC;
+      Long idAfter, String cursor, String sortField, String sortDirection, Integer size) {
 
     // Pageable 객체 생성 (size만 설정)
     Pageable pageable = PageRequest.of(0, size);
 
     // 데이터 조회
     List<IndexData> indexDataList = indexDataRepository.findIndexData(
-        indexInfoId, startDate, endDate, idAfter, sortField, sortOrder, pageable
+        indexInfoId, startDate, endDate, idAfter, cursor, sortField, sortDirection, pageable
     );
 
     // 전체 데이터 개수 조회
