@@ -159,7 +159,6 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
 
     OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(
         order, path.get(sortField, Comparable.class));
-    ;
 
     return queryFactory.selectFrom(indexData).where(builder).orderBy(orderSpecifier).fetch();
   }
