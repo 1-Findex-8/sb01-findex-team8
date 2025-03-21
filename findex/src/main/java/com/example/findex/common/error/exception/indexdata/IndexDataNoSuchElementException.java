@@ -1,7 +1,7 @@
-package com.example.findex.global.error.exception.indexdata;
+package com.example.findex.common.error.exception.indexdata;
 
-import com.example.findex.global.error.ErrorCode;
-import com.example.findex.global.error.exception.BusinessException;
+import com.example.findex.common.error.ErrorCode;
+import com.example.findex.common.error.exception.BusinessException;
 
 public class IndexDataNoSuchElementException extends BusinessException {
 

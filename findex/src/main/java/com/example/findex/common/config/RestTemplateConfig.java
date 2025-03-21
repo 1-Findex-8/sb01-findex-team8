@@ -1,4 +1,4 @@
-package com.example.findex.global.config;
+package com.example.findex.common.config;
 
 import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;

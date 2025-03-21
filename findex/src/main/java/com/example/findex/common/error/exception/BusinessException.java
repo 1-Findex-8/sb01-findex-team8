@@ -1,6 +1,6 @@
-package com.example.findex.global.error.exception;
+package com.example.findex.common.error.exception;
 
-import com.example.findex.global.error.ErrorCode;
+import com.example.findex.common.error.ErrorCode;
 import lombok.Getter;
 
 @Getter

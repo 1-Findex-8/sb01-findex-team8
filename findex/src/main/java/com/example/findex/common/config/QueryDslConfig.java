@@ -1,4 +1,4 @@
-package com.example.findex.global.config;
+package com.example.findex.common.config;
 
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;

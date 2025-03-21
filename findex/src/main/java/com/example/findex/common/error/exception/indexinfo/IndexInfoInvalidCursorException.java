@@ -1,7 +1,7 @@
-package com.example.findex.global.error.exception.indexinfo;
+package com.example.findex.common.error.exception.indexinfo;
 
-import com.example.findex.global.error.ErrorCode;
-import com.example.findex.global.error.exception.BusinessException;
+import com.example.findex.common.error.ErrorCode;
+import com.example.findex.common.error.exception.BusinessException;
 
 public class IndexInfoInvalidCursorException extends BusinessException {
   public IndexInfoInvalidCursorException() { super(ErrorCode.INDEX_INFO_INVALID_CURSOR); }
