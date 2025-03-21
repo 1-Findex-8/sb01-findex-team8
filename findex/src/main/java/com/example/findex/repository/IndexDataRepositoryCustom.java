@@ -16,4 +16,10 @@ public interface IndexDataRepositoryCustom {
       Long indexInfoId, LocalDate startDate, LocalDate endDate, String sortField,
       String sortDirection
   );
+
+  List<IndexData> findByFiltersWithQueryDSL(
+      Long indexInfoId, LocalDate startDate,
+      LocalDate endDate, String sortField,
+      String sortDirection
+  );
 }
