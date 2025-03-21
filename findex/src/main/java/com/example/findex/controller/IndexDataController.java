@@ -87,7 +87,7 @@ public class IndexDataController implements IndexDataApi {
   ){
     CursorPageResponseIndexDataDto response = indexDataService.findIndexDataList(
         indexInfoId, startDate, endDate, idAfter,
-        sortField, "asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC, size);
+        sortField, String.valueOf("asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC), size);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
