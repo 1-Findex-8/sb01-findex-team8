@@ -5,6 +5,7 @@ import com.example.findex.entity.QIndexData;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
