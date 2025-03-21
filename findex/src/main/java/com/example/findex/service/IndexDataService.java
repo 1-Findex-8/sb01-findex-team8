@@ -291,7 +291,7 @@ public class IndexDataService {
       Long indexInfoId, LocalDate startDate, LocalDate endDate,
       String sortField, String sortDirection
   ) {
-    return indexDataRepository.findByFilters(
+    return indexDataRepository.findByFiltersWithQueryDSL(
         indexInfoId, startDate, endDate, sortField, sortDirection);
   }
 

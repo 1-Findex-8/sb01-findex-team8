@@ -79,6 +79,38 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
     return query.fetch();
   }
 
+  @Override
+  public List<IndexData> findByFiltersWithQueryDSL(
+      Long indexInfoId, LocalDate startDate,
+      LocalDate endDate, String sortField,
+      String sortDirection
+  ) {
+    QIndexData indexData = QIndexData.indexData;
+    JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+    BooleanBuilder builder = new BooleanBuilder();
+    if (indexInfoId != null) {
+      builder.and(indexData.indexInfo.id.eq(indexInfoId));
+    }
+    if (startDate != null) {
+      builder.and(indexData.baseDate.goe(startDate));
+    }
+    if (endDate != null) {
+      builder.and(indexData.baseDate.loe(endDate));
+    }
+
+    PathBuilder<IndexData> path = new PathBuilder<>(IndexData.class, "indexData");
+    Order order = "desc".equalsIgnoreCase(sortDirection) ? Order.DESC : Order.ASC;
+
+    OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(
+        order, path.get(sortField, Comparable.class));
+    ;
+
+    return queryFactory.selectFrom(indexData).where(builder).orderBy(orderSpecifier).fetch();
+  }
+
+  ;
+
   @Transactional(readOnly = true)
   public List<IndexData> findByFilters(
       Long indexInfoId,
@@ -96,7 +128,6 @@ public class IndexDataRepositoryImpl implements IndexDataRepositoryCustom {
     if (indexInfoId != null) {
       predicates.add(cb.equal(root.get("indexInfo").get("id"), indexInfoId));
     }
-
     if (startDate != null) {
       predicates.add(cb.greaterThanOrEqualTo(root.get("baseDate"), startDate));
     }
