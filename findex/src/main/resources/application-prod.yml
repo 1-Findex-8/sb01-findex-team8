@@ -1,6 +1,4 @@
 spring:
-  config:
-    import: secret.yml
   datasource:
     url: ${DATABASE_URL}
     username: ${USERNAME}
