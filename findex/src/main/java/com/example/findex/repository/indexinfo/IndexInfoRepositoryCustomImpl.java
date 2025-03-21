@@ -1,15 +1,18 @@
 package com.example.findex.repository.indexinfo;
 
 import com.example.findex.dto.indexinfo.SortDirectionType;
-import com.querydsl.core.BooleanBuilder;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.QIndexInfo;
+import com.example.findex.repository.indexinfo.IndexInfoRepositoryCustom;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class IndexInfoRepositoryCustomImpl implements IndexInfoRepositoryCustom 
       String cursor,
       String sortField,
       SortDirectionType sortDirectionType,
-      Pageable pageable) {
+      int size) {
 
     QIndexInfo i = QIndexInfo.indexInfo;
     BooleanBuilder whereClause = new BooleanBuilder();
@@ -44,51 +47,78 @@ public class IndexInfoRepositoryCustomImpl implements IndexInfoRepositoryCustom 
       whereClause.and(i.id.gt(idAfter));
     }
 
-    // 정렬 처리 (sortField에 따른 동적 정렬)
-    if (sortField != null) {
-      if (sortField.equals("indexClassification")) {
-        whereClause.and(i.indexClassification.isNotNull());
-      } else if (sortField.equals("indexName")) {
-        whereClause.and(i.indexName.isNotNull());
-      } else if (sortField.equals("employedItemsCount")) {
-        whereClause.and(i.employedItemsCount.isNotNull());
-      }
-    }
+    // 정렬 조건 생성 (중복 방지)
+    List<OrderSpecifier<?>> orderSpecifiers = getOrderByClause(sortField, sortDirectionType, i);
 
-    // 데이터를 페이지네이션 처리
+    // 커서 조건 추가
+    applyCursorCondition(whereClause, cursor, sortField, sortDirectionType, i);
+
+    // 전체 개수 조회 (한 번만 수행)
+    Long totalElements = queryFactory
+        .select(i.count())
+        .from(i)
+        .where(whereClause)
+        .fetchOne();
+
+    // 데이터 조회 (커서 기반 페이징 적용)
     List<IndexInfo> results = queryFactory
         .selectFrom(i)
         .where(whereClause)
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .orderBy(
-            // 첫 번째로 정렬 조건을 반영 (sortField가 null일 경우 기본 정렬)
-            getOrderByClause(sortField, sortDirectionType, i)
-        )
+        .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0])) // 정렬 적용
+        .limit(size)
         .fetch();
 
-    // 전체 데이터 수 조회
-    long total = queryFactory
-        .selectFrom(i)
-        .where(whereClause)
-        .fetchCount();
-
-    // 마지막 요소 ID를 기준으로 페이지네이션 처리
-    Long nextIdAfter = results.isEmpty() ? null : results.get(results.size() - 1).getId();
-    boolean hasNext = results.size() == pageable.getPageSize();
-
-    return new PageImpl<>(results, pageable, total);
+    return new PageImpl<>(results, PageRequest.of(0, size), totalElements);
   }
 
-  // 정렬 조건을 동적으로 처리하는 메서드
-  private OrderSpecifier<?> getOrderByClause(String sortField, SortDirectionType sortDirectionType, QIndexInfo i) {
-    if (sortField == null || sortField.equals("indexClassification")) {
-      return sortDirectionType == SortDirectionType.asc ? i.indexClassification.asc() : i.indexClassification.desc();
-    } else if (sortField.equals("indexName")) {
-      return sortDirectionType == SortDirectionType.asc ? i.indexName.asc() : i.indexName.desc();
-    } else if (sortField.equals("employedItemsCount")) {
-      return sortDirectionType == SortDirectionType.asc ? i.employedItemsCount.asc() : i.employedItemsCount.desc();
+  // 정렬 기준 설정 (id 추가)
+  private List<OrderSpecifier<?>> getOrderByClause(String sortField, SortDirectionType sortDirectionType, QIndexInfo i) {
+    List<OrderSpecifier<?>> orders = new ArrayList<>();
+
+    if ("indexClassification".equals(sortField)) {
+      orders.add(sortDirectionType == SortDirectionType.asc ? i.indexClassification.asc() : i.indexClassification.desc());
+    } else if ("indexName".equals(sortField)) {
+      orders.add(sortDirectionType == SortDirectionType.asc ? i.indexName.asc() : i.indexName.desc());
+    } else if ("employedItemsCount".equals(sortField)) {
+      orders.add(sortDirectionType == SortDirectionType.asc ? i.employedItemsCount.asc() : i.employedItemsCount.desc());
     }
-    return i.id.asc();  // 기본 정렬은 id 기준으로 처리
+
+    // ID 추가 (중복 방지)
+    orders.add(sortDirectionType == SortDirectionType.asc ? i.id.asc() : i.id.desc());
+
+    return orders;
+  }
+
+  // 커서 조건 추가
+  private void applyCursorCondition(BooleanBuilder whereClause, String cursor, String sortField, SortDirectionType sortDirectionType, QIndexInfo i) {
+    if (cursor == null) return;
+
+    String[] cursorParts = cursor.split(":"); // "정렬필드값:ID" 형식으로 전달
+    String cursorValue = cursorParts[0];
+    Long cursorId = Long.parseLong(cursorParts[1]);
+
+    if ("indexClassification".equals(sortField)) {
+      whereClause.and(
+          sortDirectionType == SortDirectionType.asc
+              ? i.indexClassification.gt(cursorValue).or(i.indexClassification.eq(cursorValue).and(i.id.gt(cursorId)))
+              : i.indexClassification.lt(cursorValue).or(i.indexClassification.eq(cursorValue).and(i.id.lt(cursorId)))
+      );
+    } else if ("indexName".equals(sortField)) {
+      whereClause.and(
+          sortDirectionType == SortDirectionType.asc
+              ? i.indexName.gt(cursorValue).or(i.indexName.eq(cursorValue).and(i.id.gt(cursorId)))
+              : i.indexName.lt(cursorValue).or(i.indexName.eq(cursorValue).and(i.id.lt(cursorId)))
+      );
+    } else if ("employedItemsCount".equals(sortField)) {
+      whereClause.and(
+          sortDirectionType == SortDirectionType.asc
+              ? i.employedItemsCount.gt(Integer.parseInt(cursorValue)).or(i.employedItemsCount.eq(Integer.parseInt(cursorValue)).and(i.id.gt(cursorId)))
+              : i.employedItemsCount.lt(Integer.parseInt(cursorValue)).or(i.employedItemsCount.eq(Integer.parseInt(cursorValue)).and(i.id.lt(cursorId)))
+      );
+    } else {
+      whereClause.and(
+          sortDirectionType == SortDirectionType.asc ? i.id.gt(cursorId) : i.id.lt(cursorId)
+      );
+    }
   }
 }

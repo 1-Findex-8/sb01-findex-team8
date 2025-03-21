@@ -16,5 +16,7 @@ public interface IndexInfoRepositoryCustom {
       String cursor,
       String sortField,
       SortDirectionType sortDirectionType,
-      Pageable pageable);
+      int size);
+
+//  Long countByFilters(String indexClassification, String indexName, Boolean favorite);
 }

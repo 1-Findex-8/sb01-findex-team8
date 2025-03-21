@@ -14,6 +14,7 @@ import com.example.findex.mapper.IndexInfoMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -86,7 +87,8 @@ public class IndexInfoService {
       SortDirectionType sortDirectionType,
       int size) {
 
-    Pageable pageable = PageRequest.of(0, size);
+    // 첫 페이지 요청이면 커서 없음
+    boolean isFirstPage = (cursor == null);
 
     Page<IndexInfo> page = indexInfoRepository.findByFilters(
         indexClassification,
@@ -96,24 +98,33 @@ public class IndexInfoService {
         cursor,
         sortField,
         sortDirectionType,
-        pageable
+        size
     );
 
-    List<IndexInfoDto> content = page.getContent()
-        .stream()
+    List<IndexInfoDto> content = page.getContent().stream()
         .map(indexInfoMapper::toDto)
-        .toList();
+        .collect(Collectors.toList());
 
-    Long nextIdAfter = content.isEmpty() ? null : content.get(content.size() - 1).id();
+    // 다음 페이지를 위한 커서 설정
+    String nextCursor = page.hasNext()
+        ? generateCursor(page.getContent().get(page.getContent().size() - 1), sortField)
+        : null;
 
-    return new CursorPageResponseIndexInfoDto(
-        content,
-        nextIdAfter,
-        size,
-        page.getTotalElements(),
-        page.hasNext()
-    );
+    return new CursorPageResponseIndexInfoDto(content, nextCursor, size, page.getTotalElements(), page.hasNext());
   }
+
+  // 커서 생성 메서드 ("정렬필드값:ID" 형식)
+  private String generateCursor(IndexInfo lastItem, String sortField) {
+    if ("indexClassification".equals(sortField)) {
+      return lastItem.getIndexClassification() + ":" + lastItem.getId();
+    } else if ("indexName".equals(sortField)) {
+      return lastItem.getIndexName() + ":" + lastItem.getId();
+    } else if ("employedItemsCount".equals(sortField)) {
+      return lastItem.getEmployedItemsCount() + ":" + lastItem.getId();
+    }
+    return lastItem.getId().toString();
+  }
+
 
   public List<IndexInfoSummaryDto> findSummaryList() {
     return indexInfoRepository.findAll()
