@@ -1,4 +1,6 @@
-package com.example.findex.dto.indexinfo;
+package com.example.findex.dto.indexinfo.request;
+
+import com.example.findex.dto.indexinfo.SortDirectionType;
 
 public record FindIndexInfoRequest(
     String indexClassification,
