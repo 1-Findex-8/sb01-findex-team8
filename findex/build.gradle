@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'checkstyle'
 }
 
 group = 'com.example'
@@ -47,11 +46,6 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-checkstyle {
-    toolVersion = '1.0' // Checkstyle 버전
-    configFile = rootProject.file('checkstyle.xml') // Checkstyle 설정 파일 경로
 }
 
 tasks.named('test') {
