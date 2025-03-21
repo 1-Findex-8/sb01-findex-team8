@@ -36,6 +36,8 @@ sb01-findex-team8
 ### :information_desk_person: 프로젝트 소개
 
 프로젝트명: 코드잇 스프린트 Spring 백엔트 트랙 초급 프로젝트 Findex
+
+
 프로젝트 기간: 2025.03.14 ~ 2025.03.23
 
 ---
