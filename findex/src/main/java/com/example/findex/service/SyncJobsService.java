@@ -14,7 +14,7 @@ import com.example.findex.entity.SourceType;
 import com.example.findex.entity.SyncJobs;
 import com.example.findex.mapper.SyncJobsMapper;
 import com.example.findex.repository.IndexDataRepository;
-import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import com.example.findex.repository.autosyncconfigs.AutoSyncConfigsRepository;
 import com.example.findex.repository.syncjob.SyncJobRepository;
 import jakarta.servlet.http.HttpServletRequest;

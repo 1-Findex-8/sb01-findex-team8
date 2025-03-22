@@ -16,7 +16,7 @@ import com.example.findex.common.error.exception.indexdata.IndexDataNoSuchElemen
 import com.example.findex.common.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
-import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import com.querydsl.core.types.Order;
 import java.time.LocalDate;
 import java.util.ArrayList;

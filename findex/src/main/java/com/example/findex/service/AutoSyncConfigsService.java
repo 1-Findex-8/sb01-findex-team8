@@ -8,7 +8,7 @@ import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
 import com.example.findex.common.error.exception.autosyncconfigs.AutoSyncConfigNotFoundException;
 import com.example.findex.mapper.AutoSyncConfigsMapper;
-import com.example.findex.repository.IndexInfoRepository;
+import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import com.example.findex.repository.autosyncconfigs.AutoSyncConfigsRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
