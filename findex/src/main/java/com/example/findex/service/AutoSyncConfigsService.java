@@ -1,12 +1,12 @@
 package com.example.findex.service;
 
-import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
-import com.example.findex.dto.autosyncconfigs.CursorPageResponseAutoSyncConfigDto;
+import com.example.findex.dto.autosyncconfigs.response.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.response.CursorPageResponseAutoSyncConfigDto;
 import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
 import com.example.findex.entity.AutoSyncConfigs;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.exception.autosyncconfigs.AutoSyncConfigNotFoundException;
+import com.example.findex.common.error.exception.autosyncconfigs.AutoSyncConfigNotFoundException;
 import com.example.findex.mapper.AutoSyncConfigsMapper;
 import com.example.findex.repository.indexinfo.IndexInfoRepository;
 import com.example.findex.repository.autosyncconfigs.AutoSyncConfigsRepository;
@@ -41,7 +41,7 @@ public class AutoSyncConfigsService {
 
   @Transactional(readOnly = true)
   public CursorPageResponseAutoSyncConfigDto findAutoSyncConfigsList(Long indexInfoId,
-      Boolean enabled, Long idAfter, Long cursor, String sortField, String sortDirection, int size) {
+      Boolean enabled, Long idAfter, String cursor, String sortField, String sortDirection, int size) {
     // 추후 indexInfoId에 대한 검증 추가
 
     Pageable pageable = getPageable(sortField, sortDirection, size);

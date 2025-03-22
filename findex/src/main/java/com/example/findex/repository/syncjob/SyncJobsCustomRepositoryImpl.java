@@ -27,7 +27,7 @@ public class SyncJobsCustomRepositoryImpl implements SyncJobsCustomRepository {
   @Override
   public Page<SyncJobs> findSyncJobsList(JobType jobType, Long indexInfoId, LocalDate baseDateFrom,
       LocalDate baseDateTo, String worker, LocalDateTime jobTimeFrom, LocalDateTime jobTimeTo,
-      Result status, Long idAfter, Long cursor, Pageable pageable) {
+      Result status, Long idAfter, String cursor, Pageable pageable) {
 
     JPAQuery<SyncJobs> query = jpaQueryFactory.selectFrom(syncJobs);
 
@@ -41,7 +41,7 @@ public class SyncJobsCustomRepositoryImpl implements SyncJobsCustomRepository {
         goeJobTime(jobTimeFrom),
         loeJobTime(jobTimeTo),
         eqStatus(status),
-        gtIdAfter(idAfter)
+        gtIdAfter(idAfter, pageable)
     );
 
     OrderSpecifier<?> orderSpecifier = getOrderSpecifier(pageable);
@@ -66,7 +66,7 @@ public class SyncJobsCustomRepositoryImpl implements SyncJobsCustomRepository {
         goeJobTime(jobTimeFrom),
         loeJobTime(jobTimeTo),
         eqStatus(status),
-        gtIdAfter(idAfter)
+        gtIdAfter(idAfter, pageable)
     );
 
     long total = Optional.ofNullable(countQuery.fetchOne()).orElse(0L);
@@ -121,7 +121,18 @@ public class SyncJobsCustomRepositoryImpl implements SyncJobsCustomRepository {
     return status != null ? syncJobs.result.eq(status) : null;
   }
 
-  private BooleanExpression gtIdAfter(Long idAfter) {
-    return idAfter != null ? syncJobs.id.gt(idAfter) : null;
+  private BooleanExpression gtIdAfter(Long idAfter, Pageable pageable) {
+    if (idAfter != null) {
+      Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 기준만 적용
+      boolean isAsc = order.isAscending();
+      String property = order.getProperty();
+
+      return switch (property) {
+        case "targetDate" -> isAsc ? syncJobs.id.lt(idAfter) : syncJobs.id.gt(idAfter);
+        case "jobTime" -> isAsc ? syncJobs.id.gt(idAfter) : syncJobs.id.lt(idAfter);
+        default -> null;
+      };
+    }
+    return null;
   }
 }

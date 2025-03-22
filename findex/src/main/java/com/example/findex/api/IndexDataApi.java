@@ -110,7 +110,7 @@ public interface IndexDataApi {
       @Parameter(description = "커서 (다음 페이지 시작점)") String cursor,
       @Parameter(description = "정렬 필드 (baseDate, marketPrice, closingPrice, highPrice, lowPrice, versus, fluctuationRate, tradingQuantity, tradingPrice, marketTotalAmount)") String sortField,
       @Parameter(description = "정렬 방향 (asc, desc)") String sortDirection,
-      @Parameter(description = "페이지 크기") int size
+      @Parameter(description = "페이지 크기") Integer size
   );
 
   //PATCH /api/index-data/{id}
@@ -179,11 +179,11 @@ public interface IndexDataApi {
       @ApiResponse(responseCode = "200", description = "지수 성과 랭킹 조회 성공", content = @Content(schema = @Schema(implementation = RankedIndexPerformanceDto.class))),
       @ApiResponse(responseCode = "400", description = "잘못된 요청")})
   ResponseEntity<List<RankedIndexPerformanceDto>> getIndexPerformanceRank(
-      @Parameter(description = "기간 타입 (DAILY, WEEKLY, MONTHLY)", required = true, example = "DAILY") @RequestParam String periodType,
+      @Parameter(description = "기간 타입 (DAILY, WEEKLY, MONTHLY)", required = false, example = "DAILY") @RequestParam String periodType,
 
-      @Parameter(description = "지수 정보 ID", required = true, example = "1") @RequestParam int indexInfoId,
+      @Parameter(description = "지수 정보 ID", required = false, example = "1") @RequestParam Integer indexInfoId,
 
-      @Parameter(description = "조회할 최대 개수", required = true, example = "10") @RequestParam int limit
+      @Parameter(description = "조회할 최대 개수", required = false, example = "10") @RequestParam Integer limit
   );
 
   @Operation(summary = "지수 데이터 CSV 다운로드", description = "지수 데이터를 CSV 파일로 다운로드합니다.")
@@ -215,6 +215,6 @@ public interface IndexDataApi {
     })
     ResponseEntity<IndexChartDto> getIndexChart(
             @PathVariable @Parameter(description = "지수 정보 ID", example = "1") int indexInfoId,
-            @RequestParam @Parameter(description = "조회 기간 타입 (예: daily, weekly, monthly)", example = "daily") String periodType
+            @RequestParam @Parameter(description = "조회 기간 타입 (예: daily, weekly, monthly)", required = false, example = "daily") String periodType
     );
 }

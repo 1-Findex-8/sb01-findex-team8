@@ -1,6 +1,8 @@
 package com.example.findex.controller;
 
-import com.example.findex.dto.autosyncconfigs.AutoSyncConfigsDto;
+import com.example.findex.api.AutoSyncConfigApi;
+import com.example.findex.dto.autosyncconfigs.response.AutoSyncConfigsDto;
+import com.example.findex.dto.autosyncconfigs.response.CursorPageResponseAutoSyncConfigDto;
 import com.example.findex.dto.autosyncconfigs.request.AutoSyncConfigsUpdatedRequest;
 import com.example.findex.service.AutoSyncConfigsService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/auto-sync-configs")
 @RequiredArgsConstructor
-public class AutoSyncConfigController {
+public class AutoSyncConfigController implements AutoSyncConfigApi {
 
   private final AutoSyncConfigsService autoSyncConfigsService;
 
@@ -28,11 +30,11 @@ public class AutoSyncConfigController {
   }
 
   @GetMapping("")
-  public ResponseEntity<?> findAutoSyncConfigsList(
+  public ResponseEntity<CursorPageResponseAutoSyncConfigDto> findAutoSyncConfigsList(
       @RequestParam(value = "indexInfoId", required = false) Long indexInfoId,
       @RequestParam(value = "enabled", required = false) Boolean enabled,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
-      @RequestParam(value = "cursor", required = false) Long cursor,
+      @RequestParam(value = "cursor", required = false) String cursor,
       @RequestParam(value = "sortField", defaultValue = "indexInfo.indexName", required = false) String sortField,
       @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection,
       @RequestParam(value = "size", defaultValue = "10", required = false) int size

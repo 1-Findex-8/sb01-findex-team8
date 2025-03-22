@@ -11,16 +11,15 @@ import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.entity.IndexData;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
-import com.example.findex.global.error.exception.indexdata.IndexDataBadRequestException;
-import com.example.findex.global.error.exception.indexdata.IndexDataInternalServerErrorException;
-import com.example.findex.global.error.exception.indexdata.IndexDataNoSuchElementException;
+import com.example.findex.common.error.exception.indexdata.IndexDataInternalServerErrorException;
+import com.example.findex.common.error.exception.indexdata.IndexDataNoSuchElementException;
+import com.example.findex.common.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexDataMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.indexinfo.IndexInfoRepository;
+import com.querydsl.core.types.Order;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,9 +37,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class IndexDataService {
 
-  private final IndexDataRepository indexDataRepository;
   private final IndexInfoRepository indexInfoRepository;
   private final IndexDataMapper indexDataMapper;
+  private final IndexDataRepository indexDataRepository;
+
 
   //지수 데이터 생성
   public IndexDataDto create(IndexDataCreateRequest request) {
@@ -72,71 +71,42 @@ public class IndexDataService {
     return indexDataMapper.toDto(savedIndexData);
   }
 
-  //지수 데이터 조회(커서 페이징네이션)
-  public CursorPageResponseIndexDataDto findIndexDataList(Long indexInfoId, LocalDate startDate,
-      LocalDate endDate, Long idAfter, String cursor, String sortField,
-      String sortDirection, int size) {
+  /**
+   * 커서 페이지네이션을 적용한 지수 데이터 조회 서비스
+   */
+  public CursorPageResponseIndexDataDto findIndexDataList(
+      Long indexInfoId, LocalDate startDate, LocalDate endDate,
+      Long idAfter, String sortField, String sortDirection, Integer size) {
 
-    //정렬필드가 sourceType이면 예외 발생
-    if("sourceType".equalsIgnoreCase(sortField)) {
-      throw new IndexDataBadRequestException();
-    }
+    Order sortOrder = "asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC;
 
-    //커서값이 있으면 페이지 번호 계산
-    int page = (cursor != null && !cursor.isEmpty()) ? getPageFromCursor(cursor,size) : 0;
-    //Pageable 객체 생성
-    Pageable pageable = PageRequest.of(page,size,Sort.by(getSortDirection(sortDirection),sortField));
+    // Pageable 객체 생성 (size만 설정)
+    Pageable pageable = PageRequest.of(0, size);
 
-    //데이터 조회
-    List<IndexData> indexDataList = indexDataRepository.findIndexData(indexInfoId,startDate,endDate,idAfter,pageable);
+    // 데이터 조회
+    List<IndexData> indexDataList = indexDataRepository.findIndexData(
+        indexInfoId, startDate, endDate, idAfter, sortField, sortOrder, pageable
+    );
 
-    //DTO 변환
-    List<IndexDataDto> content = indexDataList.stream()
+    // 전체 데이터 개수 조회
+    long totalElements = indexDataRepository.countIndexData(indexInfoId, startDate, endDate);
+
+    // DTO 변환
+    List<IndexDataDto> indexDataDtos = indexDataList.stream()
         .map(indexDataMapper::toDto)
-        .toList();
+        .collect(Collectors.toList());
 
+    // 마지막 요소 ID 설정
+    Long nextIdAfter = indexDataDtos.isEmpty() ? null : indexDataDtos.get(indexDataDtos.size() - 1).id();
+    boolean hasNext = (nextIdAfter != null) && (indexDataDtos.size() == size);
 
-    //마지막 요소의 ID 저장
-    Long nextIdAfter = content.isEmpty() ? null : content.get(content.size() - 1).id();
-    //nextCursor 생성
-    String nextCursor = nextIdAfter != null ? encodeCursor(nextIdAfter) : null;
-    //현재 페이지 사이즈가 size와 같으면 다음 페이지 존재
-    boolean hasNext = content.size() == size && nextIdAfter != null;
-
-    return new CursorPageResponseIndexDataDto(content,nextCursor,nextIdAfter,size,(long)content.size(),hasNext);
-  }
-  //페이지 번호 계산 메서드
-  private int getPageFromCursor(String cursor, int size) {
-    Long idAfter = decodeCursor(cursor);
-    // idAfter가 null일 경우 첫 페이지로 설정
-    return idAfter != null ? (int) (idAfter / size) : 0;
-  }
-
-
-  // 정렬 방향 메서드
-  private Sort.Direction getSortDirection(String direction) {
-    return "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
-  }
-
-  //커서 디코딩
-  private Long decodeCursor(String cursor) {
-    // 커서를 디코딩하여 해당 ID를 반환하는 메소드
-    try {
-      return cursor != null ? Long.valueOf(new String(Base64.getDecoder().decode(cursor))) : null;
-    } catch (IllegalArgumentException e) {
-      return null; // 잘못된 커서 값 처리
-    }
-  }
-
-  // 커서 인코딩
-  private String encodeCursor(Long id) {
-    return Base64.getEncoder().encodeToString(String.format("{\"id\":%d}", id).getBytes());
+    return new CursorPageResponseIndexDataDto(indexDataDtos, null, nextIdAfter, size, totalElements, hasNext);
   }
 
   //지수 데이터 업데이트
   public IndexDataDto updateIndexData(Long id, IndexDataUpdateRequest request) {
     IndexData updateIndexData = indexDataRepository.findById(id)
-        .orElseThrow(() -> new IndexDataNoSuchElementException());
+        .orElseThrow(IndexDataNoSuchElementException::new);
 
     if (request.marketPrice() != null) {
       updateIndexData.updateMarketPrice(request.marketPrice());
@@ -172,7 +142,7 @@ public class IndexDataService {
   }
 
   public void delete(Long id) {
-    if(indexDataRepository.existsById(id)) {
+    if(!indexDataRepository.existsById(id)) {
       throw new IndexDataNoSuchElementException();
     }
     indexDataRepository.deleteById(id);
@@ -213,17 +183,20 @@ public class IndexDataService {
         .collect(Collectors.toList());
   }
 
-  public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, int indexInfoId, int limit) {
+  public List<RankedIndexPerformanceDto> getIndexPerformanceRank(String periodType, Integer indexInfoId, Integer limit) {
 
     LocalDate beforeDate = calculateStartDate(periodType);
     LocalDate today = LocalDate.now();
 
-    IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
-        .orElseThrow(IndexInfoNotFoundException::new);
+    List<IndexInfo> indexInfoList;
 
-    List<IndexInfo> indexInfoList =
-        indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
-
+    if (indexInfoId == null || indexInfoId <= 0) {
+      indexInfoList = indexInfoRepository.findAll();  // 모든 IndexInfo 조회
+    } else {
+      IndexInfo targetIndexInfo = indexInfoRepository.findById((long) indexInfoId)
+          .orElseThrow(IndexInfoNotFoundException::new);
+      indexInfoList = indexInfoRepository.findByIndexClassification(targetIndexInfo.getIndexClassification());
+    }
     // 모든 IndexInfo의 IndexData를 한 번의 쿼리로 조회
     List<IndexData> indexDataList = indexDataRepository.findByIndexInfoInAndBaseDateIn(indexInfoList, List.of(beforeDate, today));
 
@@ -288,7 +261,7 @@ public class IndexDataService {
       Long indexInfoId, LocalDate startDate, LocalDate endDate,
       String sortField, String sortDirection
   ) {
-    return indexDataRepository.findByFilters(
+    return indexDataRepository.findByFiltersWithQueryDSL(
         indexInfoId, startDate, endDate, sortField, sortDirection);
   }
 
@@ -298,6 +271,8 @@ public class IndexDataService {
       case "DAILY" -> today;
       case "WEEKLY" -> today.minusWeeks(1);
       case "MONTHLY" -> today.minusMonths(1);
+      case "QUARTERLY" -> today.minusMonths(3);
+      case "YEARLY" -> today.minusYears(1);
       default -> throw new IllegalStateException("Unexpected value: " + periodType);
     };
   }
@@ -340,11 +315,10 @@ public class IndexDataService {
   }
 
   private String convertToCsv(List<IndexData> indexDataList) {
-    String header = "IndexInfoId, BaseDate, ClosingPrice, HighPrice, LowPrice, Variation, FluctuationRate, TradingQuantity, TradingPrice, MarketCapitalization";
+    String header = "기준일자, 종가, 고가, 저가, 전일대비등락, 등락률, 거래량, 거래대금, 시가총액";
 
     String body = indexDataList.stream()
             .map(data -> String.join(",",
-                    String.valueOf(data.getIndexInfo().getId()),
                     data.getBaseDate().toString(),
                     data.getClosingPrice().toPlainString(),
                     data.getHighPrice().toPlainString(),

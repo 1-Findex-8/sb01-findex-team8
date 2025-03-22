@@ -1,15 +1,15 @@
 package com.example.findex.service;
 
-import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
-import com.example.findex.dto.indexinfo.CursorPageResponseIndexInfoDto;
+import com.example.findex.dto.indexinfo.request.CreateIndexInfoRequest;
+import com.example.findex.dto.indexinfo.response.CursorPageResponseIndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoSummaryDto;
 import com.example.findex.dto.indexinfo.SortDirectionType;
-import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
+import com.example.findex.dto.indexinfo.request.UpdateIndexInfoRequest;
 import com.example.findex.entity.IndexInfo;
 import com.example.findex.entity.SourceType;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoDuplicateException;
-import com.example.findex.global.error.exception.indexinfo.IndexInfoNotFoundException;
+import com.example.findex.common.error.exception.indexinfo.IndexInfoDuplicateException;
+import com.example.findex.common.error.exception.indexinfo.IndexInfoNotFoundException;
 import com.example.findex.mapper.IndexInfoMapper;
 import com.example.findex.repository.IndexDataRepository;
 import com.example.findex.repository.indexinfo.IndexInfoRepository;

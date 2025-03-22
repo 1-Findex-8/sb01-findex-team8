@@ -1,12 +1,11 @@
 package com.example.findex.controller;
 
-import com.example.findex.dto.indexinfo.CreateIndexInfoRequest;
-import com.example.findex.dto.indexinfo.CursorPageResponseIndexInfoDto;
+import com.example.findex.dto.indexinfo.request.CreateIndexInfoRequest;
+import com.example.findex.dto.indexinfo.response.CursorPageResponseIndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoDto;
 import com.example.findex.dto.indexinfo.IndexInfoSummaryDto;
 import com.example.findex.dto.indexinfo.SortDirectionType;
-import com.example.findex.dto.indexinfo.UpdateIndexInfoRequest;
-import com.example.findex.entity.SourceType;
+import com.example.findex.dto.indexinfo.request.UpdateIndexInfoRequest;
 import com.example.findex.service.IndexInfoService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -61,9 +60,9 @@ public class IndexInfoController {
       @RequestParam(value = "favorite", required = false) Boolean favorite,
       @RequestParam(value = "idAfter", required = false) Long idAfter,
       @RequestParam(value = "cursor", required = false) String cursor,
-      @RequestParam(value = "sortField", required = false) String sortField,
-      @RequestParam(value = "sortDirection", required = false) SortDirectionType sortDirection,
-      @RequestParam(value = "size", required = false, defaultValue = "10") int size
+      @RequestParam(value = "sortField", required = false, defaultValue = "indexClassification") String sortField,
+      @RequestParam(value = "sortDirection", required = false, defaultValue = "desc") SortDirectionType sortDirection,
+      @RequestParam(value = "size", required = false,defaultValue = "10") Integer size
       ) {
     return ResponseEntity
         .status(HttpStatus.OK)

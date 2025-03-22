@@ -9,7 +9,7 @@ import com.example.findex.dto.indexdata.response.IndexChartDto;
 import com.example.findex.dto.indexdata.response.IndexPerformanceDto;
 import com.example.findex.dto.indexdata.response.RankedIndexPerformanceDto;
 import com.example.findex.service.IndexDataService;
-import com.example.findex.service.IndexInfoService;
+import com.querydsl.core.types.Order;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -36,12 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexDataController implements IndexDataApi {
 
   private final IndexDataService indexDataService;
-  private final IndexInfoService indexInfoService;
 
   @Override
   @GetMapping("/performance/favorite")
   public ResponseEntity<List<IndexPerformanceDto>> getIndexFavoritePerformanceRank(
-      @RequestParam String periodType
+      @RequestParam(required = false, defaultValue = "DAILY") String periodType
   ){
     List<IndexPerformanceDto> dto = indexDataService.getInterestIndexPerformance(periodType);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
@@ -50,9 +49,9 @@ public class IndexDataController implements IndexDataApi {
   @Override
   @GetMapping("/performance/rank")
   public ResponseEntity<List<RankedIndexPerformanceDto>> getIndexPerformanceRank(
-      @RequestParam String periodType,
-      @RequestParam int indexInfoId,
-      @RequestParam int limit) {
+      @RequestParam(required = false, defaultValue = "DAILY") String periodType,
+      @RequestParam(required = false) Integer indexInfoId,
+      @RequestParam(required = false, defaultValue = "10") Integer limit) {
     List<RankedIndexPerformanceDto> dto = indexDataService.getIndexPerformanceRank(periodType, indexInfoId, limit);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
@@ -61,20 +60,20 @@ public class IndexDataController implements IndexDataApi {
   @GetMapping("/{indexInfoId}/chart")
   public ResponseEntity<IndexChartDto> getIndexChart(
       @PathVariable int indexInfoId,
-      @RequestParam String periodType
+      @RequestParam(required = false, defaultValue = "DAILY")  String periodType
   ) {
     IndexChartDto dto = indexDataService.getIndexChart(periodType, indexInfoId);
     return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 
-  @PostMapping
+  @PostMapping("")
   @Override
   public ResponseEntity<?> createIndexData(@RequestBody IndexDataCreateRequest indexDataCreateRequest) {
     IndexDataDto response = indexDataService.create(indexDataCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @GetMapping
+  @GetMapping("")
   @Override
   public ResponseEntity<CursorPageResponseIndexDataDto> getIndexDataList(
       @RequestParam(value = "indexInfoId",required = false) Long indexInfoId,
@@ -84,11 +83,11 @@ public class IndexDataController implements IndexDataApi {
       @RequestParam(value = "cursor",required = false) String cursor,
       @RequestParam(value = "sortField",required = false, defaultValue = "baseDate") String sortField,
       @RequestParam(value = "sortDirection",required = false, defaultValue = "desc") String sortDirection,
-      @RequestParam(value = "size",required = false, defaultValue = "10") int size
+      @RequestParam(value = "size",required = false, defaultValue = "10") Integer size
   ){
     CursorPageResponseIndexDataDto response = indexDataService.findIndexDataList(
-        indexInfoId,startDate,endDate,idAfter,cursor,sortField,sortDirection,size
-    );
+        indexInfoId, startDate, endDate, idAfter,
+        sortField, String.valueOf("asc".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC), size);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 

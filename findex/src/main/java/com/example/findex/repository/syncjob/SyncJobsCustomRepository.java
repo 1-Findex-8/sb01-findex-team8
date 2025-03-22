@@ -13,6 +13,6 @@ public interface SyncJobsCustomRepository {
   Page<SyncJobs> findSyncJobsList(
       JobType jobType, Long indexInfoId, LocalDate baseDateFrom, LocalDate baseDateTo,
       String worker, LocalDateTime jobTimeFrom, LocalDateTime jobTimeTo, Result status,
-      Long idAfter, Long cursor, Pageable pageable
+      Long idAfter, String cursor, Pageable pageable
   );
 }
