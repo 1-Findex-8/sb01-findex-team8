@@ -20,6 +20,6 @@ public class SwaggerConfig {
     return new Info()
         .title("Findex API 문서")
         .description("Findex 프로젝트의 Swagger API 문서입니다.")
-        .version("0.0.1");
+        .version("v0.0.1");
   }
 }
