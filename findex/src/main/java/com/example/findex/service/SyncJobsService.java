@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -305,8 +306,20 @@ public class SyncJobsService {
 
   private String getBaseDate() {
     LocalDate today = LocalDate.now();
-    LocalDate yesterday = today.minusDays(2);
-    return formatLocalDate(yesterday);
+    DayOfWeek todayDayOfWeek = today.getDayOfWeek();
+    DayOfWeek[] dayOfWeeks = {DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY, DayOfWeek.MONDAY};
+
+    if (DayOfWeek.MONDAY == todayDayOfWeek) {
+      return formatLocalDate(today.minusWeeks(1).with(DayOfWeek.THURSDAY));
+    }
+
+    for (DayOfWeek dayOfWeek : dayOfWeeks) {
+      if (todayDayOfWeek == dayOfWeek) {
+        return formatLocalDate(today.with(DayOfWeek.THURSDAY));
+      }
+    }
+
+    return formatLocalDate(today.minusDays(1));
   }
 
   private String formatLocalDate(LocalDate localDate) {
