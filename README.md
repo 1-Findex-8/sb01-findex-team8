@@ -20,8 +20,9 @@ sb01-findex-team8
 - 장태준 (https://github.com/janghoosa)
 ---
 
-### :tv: 시연영상 및 발표자료
-![GIF](link_to_gif) 
+### :tv: 발표자료
+[8팀 발표자료.pdf](https://github.com/user-attachments/files/19412259/8.pdf)
+
 
 ---
 
@@ -109,8 +110,6 @@ sb01-findex-team8
    │     │           │  ├─ AutoSyncConfigApi.java
    │     │           │  ├─ IndexDataApi.java
    │     │           │  └─ SyncJobApi.java
-   │     │           ├─ config
-   │     │           │  └─ QueryDSLConfig.java
    │     │           ├─ controller
    │     │           │  ├─ AutoSyncConfigController.java
    │     │           │  ├─ IndexDataController.java

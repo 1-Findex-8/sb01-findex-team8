@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public record RankedIndexPerformanceDto(
     @Schema(description = "지수 성과 정보")
-    IndexPerformanceDto dto,
+    IndexPerformanceDto performance,
 
     @Schema(description = "순위", example = "1")
     int rank
