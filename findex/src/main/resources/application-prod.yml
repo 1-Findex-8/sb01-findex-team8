@@ -3,6 +3,9 @@ spring:
     url: ${DATABASE_URL}
     username: ${USERNAME}
     password: ${PASSWORD}
+    hikari:
+      maximum-pool-size: 4
+      connection-init-sql: SET TIME ZONE 'Asia/Seoul'
   jpa:
     database: postgresql
     hibernate:
